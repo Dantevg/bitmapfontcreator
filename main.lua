@@ -14,7 +14,6 @@
 
 function love.load()
 	xml = require "lib/xml2lua"
-	toXML = require "lib/xml"
 	ufo = require "lib/ufo"
 	font = require "font"
 	gui = require("lib/Gspot"):setComponentMax(255)

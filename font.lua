@@ -5,6 +5,8 @@
 	
 ]]--
 
+local ufo = require "lib/ufo"
+
 local font = {}
 
 function font.new(options)
@@ -25,8 +27,8 @@ end
 font.outputfiles = {}
 
 -- http://unifiedfontobject.org/versions/ufo3/metainfo.plist/
-function font.outputfiles.metainfo(font)
-	if type(font.author) ~= "string" or #font.author < 1 then
+function font.outputfiles.metainfo(fnt)
+	if type(fnt.author) ~= "string" or #fnt.author < 1 then
 		return false, "Author name must be present"
 	end
 	
@@ -41,7 +43,7 @@ function font.outputfiles.metainfo(font)
 end
 
 -- http://unifiedfontobject.org/versions/ufo3/layercontents.plist/
-function font.outputfiles.layercontents(font)
+function font.outputfiles.layercontents(fnt)
 	
 end
 

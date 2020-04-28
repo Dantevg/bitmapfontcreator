@@ -12,12 +12,11 @@
 	
 ]]--
 
+local xml = require "lib/xml2lua"
+local font = require "font"
+local gui = require("lib/Gspot"):setComponentMax(255)
+
 function love.load()
-	xml = require "lib/xml2lua"
-	ufo = require "lib/ufo"
-	font = require "font"
-	gui = require("lib/Gspot"):setComponentMax(255)
-	
 	canvas = love.graphics.newCanvas()
 	
 	local fnt = font({name = "My Font!"})

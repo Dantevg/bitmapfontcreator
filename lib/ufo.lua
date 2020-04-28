@@ -38,7 +38,7 @@ function ufo.toXML( data, level )
 			if type(v) == "table" then
 				s = s.."\n"..string.rep( "    ", level+1 )..ufo.toXML( v, level+1 )
 			else
-				s = s.."\n"..string.rep( "    ", level+1 )..tostring( data[i] )
+				s = s.."\n"..string.rep( "    ", level+1 )..tostring( v )
 			end
 		end
 		s = s.."\n"..string.rep( "    ", level )
@@ -80,7 +80,7 @@ end
 function ufo.plist(input)
 	if type(input) ~= "table" then error("Expected table") end
 	
-	data = {
+	local data = {
 		name = "plist",
 		attr = {version = "1.0"},
 		input,

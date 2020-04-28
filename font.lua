@@ -29,7 +29,7 @@ font.outputfiles = {}
 -- http://unifiedfontobject.org/versions/ufo3/metainfo.plist/
 function font.outputfiles.metainfo(fnt)
 	if type(fnt.author) ~= "string" or #fnt.author < 1 then
-		return false, "Author name must be present"
+		return false, "Author name must be present and not empty"
 	end
 	
 	return ufo.plistHeader.."\n"..ufo.toXML(
@@ -42,9 +42,72 @@ function font.outputfiles.metainfo(fnt)
 	)
 end
 
+-- http://unifiedfontobject.org/versions/ufo3/fontinfo.plist/
+function font.outputfiles.fontinfo(fnt)
+	local info = {}
+	
+	local function insertIfPresent( name, data )
+		if data then
+			table.insert( info, {name = name, data} )
+		end
+	end
+	
+	insertIfPresent( "familyName", fnt.family )
+	insertIfPresent( "versionMajor", fnt.version[1] )
+	insertIfPresent( "versionMinor", fnt.version[2] )
+	insertIfPresent( "year", fnt.year )
+	
+	insertIfPresent( "copyright", fnt.copyright )
+	insertIfPresent( "trademark", fnt.trademark )
+	
+	insertIfPresent( "unitsPerEm", fnt.unitsPerEm )
+	insertIfPresent( "descender", fnt.descender )
+	insertIfPresent( "xHeight", fnt.xHeight )
+	insertIfPresent( "capHeight", fnt.capHeight )
+	insertIfPresent( "ascender", fnt.ascender )
+	
+	insertIfPresent( "note", fnt.note )
+	
+	return ufo.plistHeader.."\n"..ufo.toXML(
+		ufo.plist(info)
+	)
+end
+
 -- http://unifiedfontobject.org/versions/ufo3/layercontents.plist/
 function font.outputfiles.layercontents(fnt)
+	if type(fnt.layers) ~= "table" or #fnt.layers < 1 then
+		return false, "Layers must be present and not empty"
+	end
 	
+	local hasGlyphsDir = false
+	
+	local layers = {}
+	for _, v in ipairs(fnt.layers) do
+		if not v.name or #v.name < 1 then
+			return false, "Layer name must be present and not empty"
+		end
+		if not v.directory or #v.directory < 1 then
+			return false, "Layer directory must be present and not empty"
+		end
+		if v.name == "public.default" and v.directory ~= "glyphs" then
+			return false, "Layer name 'public.default' may only be used for directory 'glyphs'"
+		end
+		if v.directory == "glyphs" then hasGlyphsDir = true end
+		table.insert( layers, ufo.array(
+			{v.name, v.directory},
+			"string"
+		) )
+	end
+	
+	if not hasGlyphsDir then
+		return false, "Default 'glyhps' dir must be present"
+	end
+	
+	return ufo.plistHeader.."\n"..ufo.toXML(
+		ufo.plist(
+			ufo.array(layers, "array")
+		)
+	)
 end
 
 function font:generateXML(what)

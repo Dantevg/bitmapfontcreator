@@ -14,6 +14,9 @@ function font.new(options)
 	return setmetatable( {
 		name = options.name or "",
 		author = options.author or "",
+		layers = {
+			{name = "public.default", directory = "glyphs"}
+		},
 		glyphs = {},
 	}, {__index = font} )
 end

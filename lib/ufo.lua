@@ -52,13 +52,13 @@ local xmlTypes = {
 	number = "integer",
 }
 
-function ufo.array( input, type )
+function ufo.array( input, xmlType )
 	if type(input) ~= "table" then error("Expected table") end
 	
 	local data = {name = "array"}
 	
 	for _, v in ipairs(input) do
-		table.insert( data, {name = type, v} )
+		table.insert( data, {name = xmlType, v} )
 	end
 	
 	return data
@@ -83,7 +83,7 @@ function ufo.plist(input)
 	local data = {
 		name = "plist",
 		attr = {version = "1.0"},
-		input,
+		unpack(input),
 	}
 	
 	return data

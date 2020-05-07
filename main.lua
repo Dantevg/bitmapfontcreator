@@ -12,6 +12,8 @@
 	- UFO compiler: https://github.com/googlefonts/fontmake
 	- Python in Lua: https://labix.org/lunatic-python
 	
+	- Example ufo font: https://github.com/adobe-fonts/source-sans-pro/tree/master/Roman/Instances/Regular/font.ufo
+	
 ]]--
 
 local xml = require "lib/xml2lua"
@@ -22,7 +24,7 @@ function love.load()
 	canvas = love.graphics.newCanvas()
 	
 	local fnt = font({name = "My Font!"})
-	fnt.author = "Me!"
+	fnt.author = "nl.dantevg"
 	
 	print("\n-----\nmetainfo\n")
 	print( fnt:generateXML("metainfo") )

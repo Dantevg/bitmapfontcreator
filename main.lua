@@ -6,9 +6,11 @@
 	main file
 	
 	Project resources:
-	- http://unifiedfontobject.org/versions/ufo3/
-	- https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=IWS-Chapter08
-	- https://notabug.org/pgimeno/Gspot/wiki
+	- UFO spec: http://unifiedfontobject.org/versions/ufo3/
+	- TTF info: https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=IWS-Chapter08
+	- GUI lib: https://notabug.org/pgimeno/Gspot/wiki
+	- UFO compiler: https://github.com/googlefonts/fontmake
+	- Python in Lua: https://labix.org/lunatic-python
 	
 ]]--
 

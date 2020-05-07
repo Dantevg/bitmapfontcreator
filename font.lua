@@ -15,9 +15,8 @@ function font.new(options)
 		name = options.name or "",
 		author = options.author or "",
 		layers = {
-			{name = "public.default", directory = "glyphs"}
+			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},
-		glyphs = {},
 	}, {__index = font} )
 end
 
@@ -38,7 +37,7 @@ function font.outputfiles.metainfo(fnt)
 	return ufo.plistHeader.."\n"..ufo.toXML(
 		ufo.plist(
 			ufo.dict{
-				creator = font.author,
+				creator = fnt.author,
 				formatVersion = 3,
 			}
 		)
@@ -91,6 +90,9 @@ function font.outputfiles.layercontents(fnt)
 		end
 		if not v.directory or #v.directory < 1 then
 			return false, "Layer directory must be present and not empty"
+		end
+		if string.sub( v.directory, 1, 7 ) ~= "glyphs." and v.directory ~= "glyphs" then
+			return false, "Non-default layer directory must start with 'glyphs.'"
 		end
 		if v.name == "public.default" and v.directory ~= "glyphs" then
 			return false, "Layer name 'public.default' may only be used for directory 'glyphs'"

@@ -55,8 +55,10 @@ function font.outputfiles.fontinfo(fnt)
 	end
 	
 	insertIfPresent( "familyName", fnt.family )
-	insertIfPresent( "versionMajor", fnt.version[1] )
-	insertIfPresent( "versionMinor", fnt.version[2] )
+	if fnt.version then
+		insertIfPresent( "versionMajor", fnt.version[1] )
+		insertIfPresent( "versionMinor", fnt.version[2] )
+	end
 	insertIfPresent( "year", fnt.year )
 	
 	insertIfPresent( "copyright", fnt.copyright )
@@ -116,8 +118,8 @@ function font.outputfiles.layercontents(fnt)
 end
 
 -- http://unifiedfontobject.org/versions/ufo3/glyphs/contents.plist/
-function font.outputfiles.glyphs_contents(layer)
-	if type(fnt.glyphs) ~= "table" then
+function font.outputfiles.glyphs_contents( fnt, layer )
+	if type(layer.glyphs) ~= "table" then
 		return false, "No glyphs present in layer"
 	end
 	
@@ -134,19 +136,18 @@ function font.outputfiles.glyphs_contents(layer)
 	)
 end
 
-function font:generateXML(what)
+function font:generateXML( what, ... )
 	if not font.outputfiles[what] then
 		error("No such output type")
 	end
 	
-	return font.outputfiles[what](self)
+	return font.outputfiles[what]( self, ... )
 end
 
 
 
 -- RETURN
 return setmetatable( font, {
-	__index = font,
 	__call = function( _, ... )
 		return font.new(...)
 	end

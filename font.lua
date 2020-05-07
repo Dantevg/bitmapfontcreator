@@ -115,6 +115,25 @@ function font.outputfiles.layercontents(fnt)
 	)
 end
 
+-- http://unifiedfontobject.org/versions/ufo3/glyphs/contents.plist/
+function font.outputfiles.glyphs_contents(layer)
+	if type(fnt.glyphs) ~= "table" then
+		return false, "No glyphs present in layer"
+	end
+	
+	local glyphs = {}
+	
+	for _, v in pairs(layer.glyphs) do
+		glyphs[v.name] = v.path
+	end
+	
+	return ufo.plistHeader.."\n"..ufo.toXML(
+		ufo.plist(
+			ufo.dict(glyphs)
+		)
+	)
+end
+
 function font:generateXML(what)
 	if not font.outputfiles[what] then
 		error("No such output type")

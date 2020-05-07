@@ -23,7 +23,15 @@ function love.load()
 	
 	local fnt = font({name = "My Font!"})
 	fnt.author = "Me!"
+	
+	print("\n-----\nmetainfo\n")
 	print( fnt:generateXML("metainfo") )
+	print("\n-----\nfontinfo\n")
+	print( fnt:generateXML("fontinfo") )
+	print("\n-----\nlayercontents\n")
+	print( fnt:generateXML("layercontents") )
+	print("\n-----\nglyphs_contents\n")
+	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
 end
 
 function love.update(dt)

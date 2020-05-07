@@ -20,6 +20,11 @@ function font.new(options)
 	}, {__index = font} )
 end
 
+-- Generates contour points from image
+function font.getContourPoints(contour)
+	
+end
+
 
 
 -- XML FILE OUTPUT
@@ -119,6 +124,7 @@ end
 
 -- http://unifiedfontobject.org/versions/ufo3/glyphs/contents.plist/
 function font.outputfiles.glyphs_contents( fnt, layer )
+	if not layer then error("Expected layer") end
 	if type(layer.glyphs) ~= "table" then
 		return false, "No glyphs present in layer"
 	end
@@ -134,6 +140,36 @@ function font.outputfiles.glyphs_contents( fnt, layer )
 			ufo.dict(glyphs)
 		)
 	)
+end
+
+function font.outputfiles.glif( fnt, glyph )
+	if not glyph then error("Expected glyph") end
+	
+	if not glyph.name or #glyph.name < 1 then
+		return false, "Glyph name must be present and not empty"
+	end
+	
+	local xml = {
+		name = "glyph",
+		attr = {name = glyph.name, format = 2}
+	}
+	
+	if glyph.unicode then
+		table.insert( xml, {name = "unicode", attr = {hex = glyph.unicode}} )
+	end
+	
+	if glyph.outline then
+		local outline = {name = "outline"}
+		if glyph.outline.contour then
+			table.insert( xml, {
+				name = "contour",
+				font.getContourPoints(glyph.outline.contour),
+			} )
+		end
+		table.insert( xml, outline )
+	end
+	
+	return ufo.xmlHeader.."\n"..ufo.toXML(xml)
 end
 
 function font:generateXML( what, ... )

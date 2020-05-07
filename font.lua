@@ -23,22 +23,24 @@ end
 -- Generates contour points from image
 -- Currently, this image is represented by a 2D array,
 -- but I plan on making it an actual image
-function font.getContourPoints(contour)
-	local points = {}
+function font.getContours(image)
+	local contours = {}
 	
-	for y = 1, #contour do
-		for x = 1, #contour[y] do
-			if contour[y][x] then
-				table.insert( points, { name = "point", attr = {x=x-1, y=y-1, type="move"} } )
-				table.insert( points, { name = "point", attr = {x=x, y=y-1, type="line"} } )
-				table.insert( points, { name = "point", attr = {x=x, y=y, type="line"} } )
-				table.insert( points, { name = "point", attr = {x=x-1, y=y, type="line"} } )
-				table.insert( points, { name = "point", attr = {x=x, y=y, type="line"} } )
+	for y = 1, #image do
+		for x = 1, #image[y] do
+			if image[y][x] then
+				local contour = {name = "contour"}
+				table.insert( contour, { name = "point", attr = {x=x-1, y=y-1, type="line"} } )
+				table.insert( contour, { name = "point", attr = {x=x, y=y-1, type="line"} } )
+				table.insert( contour, { name = "point", attr = {x=x, y=y, type="line"} } )
+				table.insert( contour, { name = "point", attr = {x=x-1, y=y, type="line"} } )
+				table.insert( contour, { name = "point", attr = {x=x, y=y, type="line"} } )
+				table.insert( contours, contour )
 			end
 		end
 	end
 	
-	return points
+	return contours
 end
 
 
@@ -174,15 +176,11 @@ function font.outputfiles.glif( fnt, glyph )
 		table.insert( xml, {name = "unicode", attr = {hex = glyph.unicode}} )
 	end
 	
-	if glyph.outline then
-		local outline = {name = "outline"}
-		if glyph.outline.contour then
-			table.insert( xml, {
-				name = "contour",
-				unpack( font.getContourPoints(glyph.outline.contour) ),
-			} )
-		end
-		table.insert( xml, outline )
+	if glyph.image then
+		table.insert( xml, {
+			name = "outline",
+			unpack( font.getContours(glyph.image) ),
+		} )
 	end
 	
 	return ufo.xmlHeader.."\n"..ufo.toXML(xml)

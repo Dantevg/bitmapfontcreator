@@ -5,6 +5,8 @@
 	
 ]]--
 
+local ufo = require "ufo"
+
 -- Helper function
 function assertEquals( a, b )
 	assert( a == b, "Expected '"..tostring(a).."', got '"..tostring(b).."'" )
@@ -15,8 +17,6 @@ end
 -- TEST DEFINITIONS
 
 function ufoConvertToFilename()
-	local ufo = require "lib/ufo"
-	
 	assertEquals( "a",                ufo.convertToFilename("a") )
 	assertEquals( "A_",               ufo.convertToFilename("A") )
 	assertEquals( "A_E_",             ufo.convertToFilename("AE") )

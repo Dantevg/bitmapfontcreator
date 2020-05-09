@@ -92,4 +92,27 @@ function ufo.plist(input)
 	return data
 end
 
+-- Converts the name to a valid filename according to ufo conventions
+-- http://unifiedfontobject.org/versions/ufo3/conventions/#common-user-name-to-file-name-algorithm
+function ufo.convertToFilename(name)
+	local charRange = "\127"
+	for i = 0, 32 do charRange = charRange..string.char(i) end
+	
+	local reservedNames = {
+		"CON","PRN","AUX","CLOCK$","NUL","A:-Z:","COM1","LPT1","LPT2","LPT3","COM2","COM3","COM4:"
+	}
+	
+	-- Replace illegal characters \001 to \032 and \127, " * + / : < > ? [ \ ] |
+	name = name:gsub( "["..charRange.."\"%*%+/:<>%?%[\\|%]]", "_" )
+	name = name:gsub( "%u", "%1_" ) -- Insert underscore after every uppercase letter
+	name = name:gsub( "^%.", "_" ) -- Replace dot at beginning of name with underscore
+	name = name:gsub( "[^%.]+", function(match) -- Avoid DOS-reserved filenames
+		for _, reserved in ipairs(reservedNames) do
+			if match:upper() == reserved then return "_"..match end
+		end
+	end )
+	
+	return name:sub( 1, 255 ) -- Cut off names longer than 255 characters
+end
+
 return ufo

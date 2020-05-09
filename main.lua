@@ -27,16 +27,16 @@ local gui = require("lib/Gspot"):setComponentMax(255)
 function love.load()
 	canvas = love.graphics.newCanvas()
 	
-	local fnt = font({name = "My Font!"})
+	local fnt = font({family = "My Font!"})
 	fnt.author = "nl.dantevg"
 	
-	print("\n-----\nmetainfo\n")
+	print("\n-----\nmetainfo.plist\n")
 	print( fnt:generateXML("metainfo") )
-	print("\n-----\nfontinfo\n")
+	print("\n-----\nfontinfo.plist\n")
 	print( fnt:generateXML("fontinfo") )
-	print("\n-----\nlayercontents\n")
+	print("\n-----\nlayercontents.plist\n")
 	print( fnt:generateXML("layercontents") )
-	print("\n-----\nglyphs_contents\n")
+	print("\n-----\nglyphs/contents.plist\n")
 	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
 end
 

@@ -12,7 +12,7 @@ local font = {}
 function font.new(options)
 	if not options then error("Expected options") end
 	return setmetatable( {
-		name = options.name or "",
+		family = options.family or "",
 		author = options.author or "",
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}

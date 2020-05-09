@@ -140,28 +140,25 @@ end
 
 function font.outputfiles.glif( fnt, glyph )
 	if not glyph then error("Expected glyph") end
-	
 	if not glyph.name or #glyph.name < 1 then
 		return false, "Glyph name must be present and not empty"
 	end
+	if not glyph.unicode then
+		return false, "Glyph unicode must be present"
+	end
 	
-	local xml = {
+	return ufo.xmlHeader.."\n"..ufo.toXML{
 		name = "glyph",
-		attr = {name = glyph.name, format = 2}
-	}
-	
-	if glyph.unicode then
-		table.insert( xml, {name = "unicode", attr = {hex = glyph.unicode}} )
-	end
-	
-	if glyph.image then
-		table.insert( xml, {
+		attr = {name = glyph.name, format = 2},
+		{
+			name = "unicode",
+			attr = { hex = glyph.unicode }
+		},
+		{
 			name = "outline",
-			unpack( glyph:getContours() ),
-		} )
-	end
-	
-	return ufo.xmlHeader.."\n"..ufo.toXML(xml)
+			unpack( glyph:getContours() )
+		},
+	}
 end
 
 function font:generateXML( what, ... )

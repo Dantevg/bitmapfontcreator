@@ -6,6 +6,7 @@
 ]]--
 
 local ufo = require "lib/ufo"
+local xml = require "lib/xml2lua"
 
 local font = {}
 
@@ -17,6 +18,14 @@ function font.new(options)
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},
+	}, {__index = font} )
+end
+
+function font.load(path)
+	local xmlInput = require "lib/xmlhandler/dom"
+	xml.parser(xmlInput):parse(input)
+	return setmetatable( {
+		
 	}, {__index = font} )
 end
 

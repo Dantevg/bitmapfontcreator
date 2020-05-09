@@ -20,29 +20,6 @@ function font.new(options)
 	}, {__index = font} )
 end
 
--- Generates contour points from image
--- Currently, this image is represented by a 2D array,
--- but I plan on making it an actual image
-function font.getContours(image)
-	local contours = {}
-	
-	for y = 1, #image do
-		for x = 1, #image[y] do
-			if image[y][x] then
-				local contour = {name = "contour"}
-				table.insert( contour, { name = "point", attr = {x=x-1, y=y-1, type="line"} } )
-				table.insert( contour, { name = "point", attr = {x=x, y=y-1, type="line"} } )
-				table.insert( contour, { name = "point", attr = {x=x, y=y, type="line"} } )
-				table.insert( contour, { name = "point", attr = {x=x-1, y=y, type="line"} } )
-				table.insert( contour, { name = "point", attr = {x=x, y=y, type="line"} } )
-				table.insert( contours, contour )
-			end
-		end
-	end
-	
-	return contours
-end
-
 
 
 -- XML FILE OUTPUT
@@ -180,7 +157,7 @@ function font.outputfiles.glif( fnt, glyph )
 	if glyph.image then
 		table.insert( xml, {
 			name = "outline",
-			unpack( font.getContours(glyph.image) ),
+			unpack( glyph:getContours() ),
 		} )
 	end
 	

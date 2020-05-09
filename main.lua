@@ -38,9 +38,13 @@ function love.load()
 	print( fnt:generateXML("layercontents") )
 	print("\n-----\nglyphs/contents.plist\n")
 	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
+	
+	handler = require "lib/xmlhandler/dom"
+	xml.parser(handler):parse( fnt:generateXML("layercontents") )
 end
 
 function love.update(dt)
+	require("lib/lovebird").update()
 	gui:update(dt)
 end
 

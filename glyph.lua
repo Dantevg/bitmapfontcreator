@@ -7,13 +7,15 @@
 
 local glyph = {}
 
-function glyph.new( width, height, advance )
-	if not width or not height or not advance then error("Expected width, height, advance") end
+function glyph.new(options)
+	if not options then error("Expected options") end
 	return setmetatable( {
-		width = width,
-		height = height,
-		advance = advance,
-		image = love.image.newImageData( width, height, "r8" ),
+		name = options.name,
+		unicode = options.unicode,
+		width = options.width,
+		height = options.height,
+		advance = options.advance,
+		image = love.image.newImageData( options.width, options.height, "r8" ),
 	}, {__index = glyph} )
 end
 

@@ -14,6 +14,10 @@
 	
 	- Example ufo font: https://github.com/adobe-fonts/source-sans-pro/tree/master/Roman/Instances/Regular/font.ufo
 	
+	To compile generated ufo font:
+	1. (install googlefonts/fontmake)
+	2. fontmake -u test.ufo -o ttf --output-path test.ttf
+	
 ]]--
 
 local xml = require "lib/xml2lua"

@@ -15,7 +15,7 @@ function glyph.new(options)
 		width = options.width,
 		height = options.height,
 		advance = options.advance,
-		image = love.image.newImageData( options.width, options.height, "r8" ),
+		image = options.image or love.image.newImageData( options.width, options.height, "r8" ),
 	}, {__index = glyph} )
 end
 
@@ -48,6 +48,11 @@ function glyph:setPixel( x, y, value )
 	end
 	
 	this.image:setPixel( x, y, value and 1 or 0 )
+end
+
+-- Save glyph as png to proper location
+function glyph:save(path)
+	this.image:encode( "png", path.."/"..ufo.convertToFilename(this.name)..".png" )
 end
 
 

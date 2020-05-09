@@ -78,6 +78,7 @@ function font.outputfiles.fontinfo(fnt)
 	end
 	
 	insertIfPresent( "familyName", fnt.family )
+	insertIfPresent( "styleName", fnt.style )
 	if fnt.version then
 		insertIfPresent( "versionMajor", fnt.version[1] )
 		insertIfPresent( "versionMinor", fnt.version[2] )

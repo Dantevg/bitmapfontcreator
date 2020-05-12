@@ -9,13 +9,15 @@ local glyph = {}
 
 function glyph.new(options)
 	if not options then error("Expected options") end
+	local imageData = options.imageData or love.image.newImageData( options.width, options.height, "r8" )
 	return setmetatable( {
 		name = options.name,
 		unicode = options.unicode,
-		width = options.width,
-		height = options.height,
+		width = options.width or imageData:getWidth(),
+		height = options.height or imageData:getHeight(),
 		advance = options.advance,
-		image = options.image or love.image.newImageData( options.width, options.height, "r8" ),
+		imageData = imageData,
+		image = love.graphics.newImage(imageData),
 	}, {__index = glyph} )
 end
 
@@ -24,7 +26,7 @@ end
 function glyph:getContours()
 	local contours = {}
 	
-	self.image:mapPixel(function( x, y, v )
+	self.imageData:mapPixel(function( x, y, v )
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
@@ -47,12 +49,14 @@ function glyph:setPixel( x, y, value )
 		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	
-	self.image:setPixel( x, y, value and 1 or 0 )
+	self.imageData:setPixel( x, y, value and 1 or 0 )
+	
+	self.image = nil -- To regenerate the image for drawing
 end
 
 -- Save glyph as png to proper location
-function glyph:save(path)
-	self.image:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
+function glyph:saveImage(path)
+	self.imageData:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
 end
 
 

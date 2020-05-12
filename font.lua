@@ -22,11 +22,30 @@ function font.new(options)
 end
 
 function font.load(path)
-	local xmlInput = require "lib/xmlhandler/dom"
-	xml.parser(xmlInput):parse(input)
+	local font = {}
+	
 	return setmetatable( {
 		
 	}, {__index = font} )
+end
+
+
+
+-- XML FILE INPUT
+
+font.inputfiles = {}
+
+function font.inputfiles.metainfo(input)
+	local xmlInput = require "lib/xmlhandler/dom"
+	xml.parser(xmlInput):parse(input)
+	local metainfo = {}
+	
+	local plist = xmlInput.root._children
+	for i = 1, #plist do
+		
+	end
+	
+	return metainfo
 end
 
 
@@ -44,12 +63,12 @@ function font.outputfiles.metainfo(fnt)
 	end
 	
 	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist(
+		ufo.plist{
 			ufo.dict{
 				creator = fnt.author,
 				formatVersion = 3,
 			}
-		)
+		}
 	)
 end
 
@@ -57,33 +76,29 @@ end
 function font.outputfiles.fontinfo(fnt)
 	local info = {}
 	
-	local function insertIfPresent( name, data )
-		if data then
-			table.insert( info, {name = name, data} )
-		end
-	end
-	
-	insertIfPresent( "familyName", fnt.family )
-	insertIfPresent( "styleName", fnt.style )
+	info.familyName = fnt.family
+	info.styleName = fnt.style
 	if fnt.version then
-		insertIfPresent( "versionMajor", fnt.version[1] )
-		insertIfPresent( "versionMinor", fnt.version[2] )
+		info.versionMajor = fnt.version[1]
+		info.versionMinor = fnt.version[2]
 	end
-	insertIfPresent( "year", fnt.year )
+	info.year = fnt.year
 	
-	insertIfPresent( "copyright", fnt.copyright )
-	insertIfPresent( "trademark", fnt.trademark )
+	info.copyright = fnt.copyright
+	info.trademark = fnt.trademark
 	
-	insertIfPresent( "unitsPerEm", fnt.unitsPerEm )
-	insertIfPresent( "descender", fnt.descender )
-	insertIfPresent( "xHeight", fnt.xHeight )
-	insertIfPresent( "capHeight", fnt.capHeight )
-	insertIfPresent( "ascender", fnt.ascender )
+	info.unitsPerEm = fnt.unitsPerEm
+	info.descender = fnt.descender
+	info.xHeight = fnt.xHeight
+	info.capHeight = fnt.capHeight
+	info.ascender = fnt.ascender
 	
-	insertIfPresent( "note", fnt.note )
+	info.note = fnt.note
 	
 	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist(info)
+		ufo.plist{
+			ufo.dict(info)
+		}
 	)
 end
 
@@ -141,9 +156,9 @@ function font.outputfiles.glyphs_contents( fnt, layer )
 	end
 	
 	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist(
+		ufo.plist{
 			ufo.dict(glyphs)
-		)
+		}
 	)
 end
 

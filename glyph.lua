@@ -24,7 +24,7 @@ end
 function glyph:getContours()
 	local contours = {}
 	
-	this.image:mapPixel(function( x, y, v )
+	self.image:mapPixel(function( x, y, v )
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
@@ -43,16 +43,16 @@ end
 
 -- Set the pixel at position (x,y) to value
 function glyph:setPixel( x, y, value )
-	if x < 0 or x >= this.width or y < 0 or y >= this.width then
-		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..this.width..","..this.height..")")
+	if x < 0 or x >= self.width or y < 0 or y >= self.width then
+		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	
-	this.image:setPixel( x, y, value and 1 or 0 )
+	self.image:setPixel( x, y, value and 1 or 0 )
 end
 
 -- Save glyph as png to proper location
 function glyph:save(path)
-	this.image:encode( "png", path.."/"..ufo.convertToFilename(this.name)..".png" )
+	self.image:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
 end
 
 

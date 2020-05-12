@@ -40,7 +40,7 @@ function love.load()
 	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
 	
 	handler = require "lib/xmlhandler/dom"
-	xml.parser(handler):parse( fnt:generateXML("layercontents") )
+	xml.parser(handler):parse( fnt:generateXML("metainfo") )
 end
 
 function love.update(dt)

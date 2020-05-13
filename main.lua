@@ -24,30 +24,50 @@ local xml = require "lib/xml2lua"
 local font = require "font"
 local gui = require("lib/Gspot"):setComponentMax(255)
 
+local fnt
+local selectedGlyph
+local redrawGlyph = true
+
 function love.load()
-	canvas = love.graphics.newCanvas()
-	
-	local fnt = font({family = "My Font!"})
-	fnt.author = "nl.dantevg"
+	local testFont = font({family = "My Font!"})
+	testFont.author = "nl.dantevg"
 	
 	print("\n-----\nmetainfo.plist\n")
-	print( fnt:generateXML("metainfo") )
+	print( testFont:generateXML("metainfo") )
 	print("\n-----\nfontinfo.plist\n")
-	print( fnt:generateXML("fontinfo") )
+	print( testFont:generateXML("fontinfo") )
 	print("\n-----\nlayercontents.plist\n")
-	print( fnt:generateXML("layercontents") )
+	print( testFont:generateXML("layercontents") )
 	print("\n-----\nglyphs/contents.plist\n")
-	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
+	print( testFont:generateXML("glyphs_contents", testFont.layers[1]) )
 	
 	handler = require "lib/xmlhandler/dom"
-	xml.parser(handler):parse( fnt:generateXML("metainfo") )
+	xml.parser(handler):parse( testFont:generateXML("metainfo") )
 	
 	-- GUI
 	gui.style.font = love.graphics.newFont(24)
-	local glyphs = gui:scrollgroup( nil, {0, 0, 50, 500} )
-	glyphs.scrollv.style.hs = "auto"
+	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, 600} )
+	glyphsList.scrollv.style.hs = "auto"
+	local glyphButtons = {}
 	for i = 32, 126 do
-		gui:text( string.char(i), {10, (i-32)*50, 50, 50}, glyphs )
+		local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
+		glyphButton.click = function(self, x, y, button)
+			if not fnt then return end
+			switchGlyph(self.label)
+			
+			-- Reset colours of other elements
+			for _, btn in ipairs(glyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
+			end
+			
+			-- Set this element's colour
+			self.style.hilite = {255,255,255,255}
+			self.style.focus = {255,255,255,255}
+			self.style.fg = {0,0,0,255}
+		end
+		table.insert( glyphButtons, glyphButton )
 	end
 end
 
@@ -58,7 +78,19 @@ end
 
 function love.draw()
 	gui:draw()
-	love.graphics.draw(canvas)
+	
+	if fnt then
+		love.graphics.draw( selectedGlyph.image, 100, 0 )
+	end
+end
+
+function switchGlyph(char)
+	for _, glyph in ipairs( fnt.layers[selectedLayer].glyphs ) do
+		if glyph.name == char then
+			selectedGlyph = glyph
+			break
+		end
+	end
 end
 
 -- Forward love2d events to Gspot GUI

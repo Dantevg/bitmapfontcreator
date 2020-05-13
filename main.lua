@@ -41,6 +41,14 @@ function love.load()
 	
 	handler = require "lib/xmlhandler/dom"
 	xml.parser(handler):parse( fnt:generateXML("metainfo") )
+	
+	-- GUI
+	gui.style.font = love.graphics.newFont(24)
+	local glyphs = gui:scrollgroup( nil, {0, 0, 50, 500} )
+	glyphs.scrollv.style.hs = "auto"
+	for i = 32, 126 do
+		gui:text( string.char(i), {10, (i-32)*50, 50, 50}, glyphs )
+	end
 end
 
 function love.update(dt)

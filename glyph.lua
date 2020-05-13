@@ -59,6 +59,14 @@ function glyph:saveImage(path)
 	self.imageData:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
 end
 
+-- Updates the image if necessary, and returns it
+function getImage()
+	if not self.image then
+		self.image = love.graphics.newImage(self.imageData)
+	end
+	return self.image
+end
+
 
 
 -- RETURN

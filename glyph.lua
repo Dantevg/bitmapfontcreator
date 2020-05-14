@@ -60,7 +60,7 @@ function glyph:saveImage(path)
 end
 
 -- Updates the image if necessary, and returns it
-function getImage()
+function glyph:getImage()
 	if not self.image then
 		self.image = love.graphics.newImage(self.imageData)
 	end

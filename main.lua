@@ -73,11 +73,11 @@ function love.load()
 		table.insert( glyphButtons, glyphButton )
 	end
 	
-	local optionsList = gui:group( nil, {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()} )
-	optionsList:setfont(12)
-	local y = 10
-	function addOptionElement( location, label )
-		local input = gui:input( label or location, {0, y, 200, 20}, optionsList )
+	local fontOptionsList = gui:group( "Font options", {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()/2} )
+	fontOptionsList:setfont(12)
+	local y = 20
+	local function addFontOptionElement( location, label )
+		local input = gui:input( label or location, {0, y, 200, 20}, fontOptionsList )
 		input.done = function(self)
 			fnt[location] = self.value
 			self.Gspot:unfocus()
@@ -85,13 +85,29 @@ function love.load()
 		y = y+30
 	end
 	
-	addOptionElement( "family", "family name" )
-	addOptionElement("author")
-	addOptionElement( "style", "variant" )
-	addOptionElement("version")
-	addOptionElement("year")
-	addOptionElement("copyright")
-	addOptionElement("trademark")
+	addFontOptionElement("family", "family name")
+	addFontOptionElement("author")
+	addFontOptionElement("style", "variant")
+	addFontOptionElement("version")
+	addFontOptionElement("year")
+	addFontOptionElement("copyright")
+	addFontOptionElement("trademark")
+	
+	local glyphOptionsList = gui:group( "Glyph options", {love.graphics.getWidth()-200, love.graphics.getHeight()/2, 200, love.graphics.getHeight()/2} )
+	glyphOptionsList:setfont(12)
+	y = 20
+	local function addGlyphOptionElement( location, label )
+		local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList )
+		input.done = function(self)
+			selectedGlyph[location] = tonumber(self.value)
+			self.Gspot:unfocus()
+		end
+		y = y+30
+	end
+	
+	addGlyphOptionElement("width")
+	addGlyphOptionElement("height")
+	addGlyphOptionElement("advance")
 end
 
 function love.update(dt)

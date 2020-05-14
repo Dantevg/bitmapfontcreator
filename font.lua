@@ -7,18 +7,34 @@
 
 local ufo = require "lib/ufo"
 local xml = require "lib/xml2lua"
+local glyph = require "glyph"
 
 local font = {}
 
 function font.new(options)
 	if not options then error("Expected options") end
-	return setmetatable( {
+	
+	local fnt = {
 		family = options.family or "",
 		author = options.author or "",
+		height = options.height,
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},
-	}, {__index = font} )
+	}
+	
+	-- Pre-fill glyphs array with empty glyphs
+	for i = 32, 126 do
+		table.insert( fnt.layers[1].glyphs, glyph{
+			name = string.char(i),
+			unicode = tostring(i), -- TODO: left-pad with 0's
+			width = 1, -- Default empty width
+			height = fnt.height or 1, -- Default empty height
+			advance = 1, -- Default empty advance
+		} )
+	end
+	
+	return setmetatable( fnt, {__index = font} )
 end
 
 function font.load(path)

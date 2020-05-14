@@ -7,7 +7,20 @@
 
 local glyph = {}
 
-glyph.pixelFormat = love.isVersionCompatible("11.3") and "r8" or "rgba8"
+if love.isVersionCompatible("11.3") then
+	glyph.pixelFormat = "r8"
+	glyph.pixelValues = {
+		[0] = {0},
+		[1] = {1},
+	}
+else
+	glyph.pixelFormat = "rgba8"
+	glyph.pixelValues = {
+		[0] = {0,0,0},
+		[1] = {1,1,1},
+	}
+end
+
 
 function glyph.new(options)
 	if not options then error("Expected options") end
@@ -51,7 +64,7 @@ function glyph:setPixel( x, y, value )
 		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	
-	self.imageData:setPixel( x, y, value and 1 or 0 )
+	self.imageData:setPixel( x, y, glyph.pixelValues[value and 1 or 0] )
 	
 	self.image = nil -- To regenerate the image for drawing
 end

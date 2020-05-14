@@ -73,7 +73,7 @@ function glyph:resize( width, height )
 	canvas:renderTo(function()
 		love.graphics.draw( self:getImage() )
 	end)
-	self.imageData = canvas:getImageData()
+	self.imageData = canvas:newImageData()
 	self.image = nil
 end
 

@@ -72,11 +72,33 @@ function love.load()
 		end
 		table.insert( glyphButtons, glyphButton )
 	end
+	
+	local optionsList = gui:group( nil, {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()} )
+	optionsList:setfont(12)
+	local y = 10
+	function addOptionElement( location, label )
+		local input = gui:input( label or location, {0, y, 200, 20}, optionsList )
+		input.done = function(self)
+			fnt[location] = self.value
+			self.Gspot:unfocus()
+		end
+		y = y+30
+	end
+	
+	addOptionElement( "family", "family name" )
+	addOptionElement("author")
+	addOptionElement( "style", "variant" )
+	addOptionElement("version")
+	addOptionElement("year")
+	addOptionElement("copyright")
+	addOptionElement("trademark")
 end
 
 function love.update(dt)
 	require("lib/lovebird").update()
 	gui:update(dt)
+	
+	love.window.setTitle( "Bitmapfontcreator - "..fnt.family )
 end
 
 function love.draw()

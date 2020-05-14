@@ -26,6 +26,7 @@ local gui = require("lib/Gspot"):setComponentMax(255)
 
 local fnt, selectedGlyph, selectedLayer
 local redrawGlyph = true
+local scale = 50
 
 function love.load()
 	fnt = font({family = "My Font!"})
@@ -82,7 +83,7 @@ function love.draw()
 	gui:draw()
 	
 	if fnt then
-		love.graphics.draw( selectedGlyph.image, 100, 0 )
+		love.graphics.draw( selectedGlyph:getImage(), 100, 0, 0, scale, scale )
 	end
 end
 
@@ -104,10 +105,16 @@ function love.textinput(key)
 end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
+	
+	if x > 100 and x < 100 + selectedGlyph.width*scale and y < selectedGlyph.height*scale then
+		selectedGlyph:setPixel( math.floor((x-100)/scale), math.floor(y/scale), btn==1 )
+	end
 end
 function love.mousereleased( x, y, btn )
 	gui:mouserelease( x, y, btn )
 end
 function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
+	
+	scale = math.min( math.max( 1, scale + y*scale*0.05 ), 200 )
 end

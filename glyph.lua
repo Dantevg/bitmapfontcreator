@@ -67,6 +67,16 @@ function glyph:getImage()
 	return self.image
 end
 
+-- Resizes the glyph without losing the contents
+function glyph:resize( width, height )
+	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
+	canvas:renderTo(function()
+		love.graphics.draw( self:getImage() )
+	end)
+	self.imageData = canvas:getImageData()
+	self.image = nil
+end
+
 
 
 -- RETURN

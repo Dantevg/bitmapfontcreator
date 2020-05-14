@@ -7,9 +7,11 @@
 
 local glyph = {}
 
+glyph.pixelFormat = love.isVersionCompatible("11.3") and "r8" or "rgba8"
+
 function glyph.new(options)
 	if not options then error("Expected options") end
-	local imageData = options.imageData or love.image.newImageData( options.width, options.height, "r8" )
+	local imageData = options.imageData or love.image.newImageData( options.width, options.height, glyph.pixelFormat )
 	return setmetatable( {
 		name = options.name,
 		unicode = options.unicode,
@@ -69,7 +71,7 @@ end
 
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
-	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
+	local canvas = love.graphics.newCanvas( width or self.width, height or self.height, {format = glyph.pixelFormat} )
 	canvas:renderTo(function()
 		love.graphics.draw( self:getImage() )
 	end)

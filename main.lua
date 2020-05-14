@@ -24,25 +24,27 @@ local xml = require "lib/xml2lua"
 local font = require "font"
 local gui = require("lib/Gspot"):setComponentMax(255)
 
-local fnt
-local selectedGlyph
+local fnt, selectedGlyph, selectedLayer
 local redrawGlyph = true
 
 function love.load()
-	local testFont = font({family = "My Font!"})
-	testFont.author = "nl.dantevg"
+	fnt = font({family = "My Font!"})
+	fnt.author = "nl.dantevg"
+	
+	selectedLayer = fnt.layers[1]
+	selectedGlyph = selectedLayer.glyphs[1]
 	
 	print("\n-----\nmetainfo.plist\n")
-	print( testFont:generateXML("metainfo") )
+	print( fnt:generateXML("metainfo") )
 	print("\n-----\nfontinfo.plist\n")
-	print( testFont:generateXML("fontinfo") )
+	print( fnt:generateXML("fontinfo") )
 	print("\n-----\nlayercontents.plist\n")
-	print( testFont:generateXML("layercontents") )
+	print( fnt:generateXML("layercontents") )
 	print("\n-----\nglyphs/contents.plist\n")
-	print( testFont:generateXML("glyphs_contents", testFont.layers[1]) )
+	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
 	
 	handler = require "lib/xmlhandler/dom"
-	xml.parser(handler):parse( testFont:generateXML("metainfo") )
+	xml.parser(handler):parse( fnt:generateXML("metainfo") )
 	
 	-- GUI
 	gui.style.font = love.graphics.newFont(24)
@@ -85,7 +87,7 @@ function love.draw()
 end
 
 function switchGlyph(char)
-	for _, glyph in ipairs( fnt.layers[selectedLayer].glyphs ) do
+	for _, glyph in ipairs( selectedLayer.glyphs ) do
 		if glyph.name == char then
 			selectedGlyph = glyph
 			break

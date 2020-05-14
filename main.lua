@@ -41,15 +41,15 @@ function love.load()
 	print("\n-----\nlayercontents.plist\n")
 	print( fnt:generateXML("layercontents") )
 	print("\n-----\nglyphs/contents.plist\n")
-	print( fnt:generateXML("glyphs_contents", fnt.layers[1]) )
+	print( fnt:generateXML("glyphs_contents", selectedLayer) )
 	
 	handler = require "lib/xmlhandler/dom"
 	xml.parser(handler):parse( fnt:generateXML("metainfo") )
 	
 	-- GUI
-	gui.style.font = love.graphics.newFont(24)
-	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, 600} )
+	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()} )
 	glyphsList.scrollv.style.hs = "auto"
+	glyphsList:setfont(24)
 	local glyphButtons = {}
 	for i = 32, 126 do
 		local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )

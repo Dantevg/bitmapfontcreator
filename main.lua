@@ -102,6 +102,10 @@ function love.load()
 			selectedGlyph[location] = tonumber(self.value)
 			self.Gspot:unfocus()
 		end
+		input.keypress = function( self, key, code )
+			self.Gspot[self.elementtype].keypress( self, key, code )
+			self.value = self.value:gsub("%D+", "") -- Remove all non-number characters
+		end
 		y = y+30
 	end
 	

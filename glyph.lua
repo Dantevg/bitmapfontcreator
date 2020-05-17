@@ -7,24 +7,9 @@
 
 local glyph = {}
 
-if love.isVersionCompatible("11.3") then
-	glyph.pixelFormat = "r8"
-	glyph.pixelValues = {
-		[0] = {0},
-		[1] = {1},
-	}
-else
-	glyph.pixelFormat = "rgba8"
-	glyph.pixelValues = {
-		[0] = {0,0,0},
-		[1] = {1,1,1},
-	}
-end
-
-
 function glyph.new(options)
 	if not options then error("Expected options") end
-	local imageData = options.imageData or love.image.newImageData( options.width, options.height, glyph.pixelFormat )
+	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
 	return setmetatable( {
 		name = options.name,
 		unicode = options.unicode,
@@ -64,7 +49,7 @@ function glyph:setPixel( x, y, value )
 		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	
-	self.imageData:setPixel( x, y, glyph.pixelValues[value and 1 or 0] )
+	self.imageData:setPixel( x, y, unpack(value and {1,1,1} or {0,0,0}) )
 	
 	self.image = nil -- To regenerate the image for drawing
 end
@@ -84,7 +69,7 @@ end
 
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
-	local canvas = love.graphics.newCanvas( width or self.width, height or self.height, {format = glyph.pixelFormat} )
+	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
 	canvas:renderTo(function()
 		love.graphics.draw( self:getImage() )
 	end)

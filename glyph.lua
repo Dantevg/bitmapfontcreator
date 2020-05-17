@@ -15,7 +15,7 @@ function glyph.new(options)
 		unicode = options.unicode,
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
-		advance = options.advance,
+		advance = options.advance or (options.width or imageData:getWidth())+1,
 		imageData = imageData,
 		image = love.graphics.newImage(imageData),
 	}, {__index = glyph} )

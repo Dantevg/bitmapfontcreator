@@ -29,6 +29,8 @@ local redrawGlyph = true
 local scale = 50
 
 function love.load()
+	love.graphics.setDefaultFilter( "nearest", "nearest" ) -- Prevent blurry glyph scaling
+	
 	fnt = font({family = "My Font!"})
 	fnt.author = "nl.dantevg"
 	
@@ -100,6 +102,9 @@ function love.load()
 		local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList )
 		input.done = function(self)
 			selectedGlyph[location] = tonumber(self.value)
+			if self.label == "width" or self.label == "height" then
+				selectedGlyph:resize()
+			end
 			self.Gspot:unfocus()
 		end
 		input.keypress = function( self, key, code )

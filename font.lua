@@ -18,6 +18,8 @@ function font.new(options)
 		family = options.family or "",
 		author = options.author or "",
 		height = options.height,
+		style = options.style or "regular",
+		version = options.version or "1.0",
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},

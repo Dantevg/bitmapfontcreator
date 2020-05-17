@@ -69,6 +69,8 @@ end
 
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
+	width, height = width or self.width, height or self.height
+	self.width, self.height = width, height
 	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
 	canvas:renderTo(function()
 		love.graphics.draw( self:getImage() )

@@ -98,8 +98,8 @@ function love.load()
 	local glyphOptionsList = gui:group( "Glyph options", {love.graphics.getWidth()-200, love.graphics.getHeight()/2, 200, love.graphics.getHeight()/2} )
 	glyphOptionsList:setfont(12)
 	y = 20
-	local function addGlyphOptionElement( location, label )
-		local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList )
+	local function addGlyphOptionElement( location, label, value )
+		local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList, value )
 		input.done = function(self)
 			selectedGlyph[location] = tonumber(self.value)
 			if self.label == "width" or self.label == "height" then
@@ -114,9 +114,9 @@ function love.load()
 		y = y+30
 	end
 	
-	addGlyphOptionElement("width")
-	addGlyphOptionElement("height")
-	addGlyphOptionElement("advance")
+	addGlyphOptionElement( "width", nil, 1 )
+	addGlyphOptionElement( "height", nil, 1 )
+	addGlyphOptionElement( "advance", nil, 1 )
 end
 
 function love.update(dt)

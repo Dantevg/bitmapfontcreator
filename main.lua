@@ -79,7 +79,7 @@ function love.load()
 	fontOptionsList:setfont(12)
 	local y = 20
 	local function addFontOptionElement( location, label )
-		local input = gui:input( label or location, {0, y, 200, 20}, fontOptionsList )
+		local input = gui:input( label or location, {0, y, 200, 20}, fontOptionsList, fnt[location] )
 		input.done = function(self)
 			fnt[location] = self.value
 			self.Gspot:unfocus()

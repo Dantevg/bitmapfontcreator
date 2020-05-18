@@ -50,6 +50,17 @@ function love.load()
 	xml.parser(handler):parse( fnt:generateXML("metainfo") )
 	
 	-- GUI
+	local actionsList = gui:group( "Actions", {65, love.graphics.getHeight()-50, love.graphics.getWidth()-200-65, 50} )
+	actionsList:setfont(12)
+	local loadFontButton = gui:button( "Load", {0, 0, 100, 50}, actionsList )
+	local saveFontButton = gui:button( "Save", {110, 0, 100, 50}, actionsList )
+	loadFontButton.click = function(self)
+		
+	end
+	saveFontButton.click = function(self)
+		fnt:save("fnt")
+	end
+	
 	local fontOptionsList = gui:group( "Font options", {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()/2} )
 	fontOptionsList:setfont(12)
 	local y = 20
@@ -93,7 +104,7 @@ function love.load()
 	addGlyphOptionElement( "height", nil, 1 )
 	addGlyphOptionElement( "advance", nil, 1 )
 	
-	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()} )
+	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()}, nil, "vertical" )
 	glyphsList.scrollv.style.hs = "auto"
 	glyphsList:setfont(24)
 	local glyphButtons = {}
@@ -132,11 +143,11 @@ function love.update(dt)
 end
 
 function love.draw()
-	gui:draw()
-	
 	if fnt then
-		love.graphics.draw( selectedGlyph:getImage(), 100, 0, 0, scale, scale )
+		love.graphics.draw( selectedGlyph:getImage(), 65, 0, 0, math.floor(scale), math.floor(scale) )
 	end
+	
+	gui:draw()
 end
 
 function switchGlyph(char)
@@ -158,8 +169,10 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	if x > 100 and x < 100 + selectedGlyph.width*scale and y < selectedGlyph.height*scale then
-		selectedGlyph:setPixel( math.floor((x-100)/scale), math.floor(y/scale), btn==1 )
+	x = math.floor((x-65)/scale)
+	y = math.floor(y/scale)
+	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
+		selectedGlyph:setPixel( x, y, btn==1 )
 	end
 end
 function love.mousereleased( x, y, btn )

@@ -50,31 +50,6 @@ function love.load()
 	xml.parser(handler):parse( fnt:generateXML("metainfo") )
 	
 	-- GUI
-	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()} )
-	glyphsList.scrollv.style.hs = "auto"
-	glyphsList:setfont(24)
-	local glyphButtons = {}
-	for i = 32, 126 do
-		local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
-		glyphButton.click = function(self, x, y, button)
-			if not fnt then return end
-			switchGlyph(self.label)
-			
-			-- Reset colours of other elements
-			for _, btn in ipairs(glyphButtons) do
-				btn.style.hilite = gui.style.hilite
-				btn.style.focus = gui.style.focus
-				btn.style.fg = gui.style.fg
-			end
-			
-			-- Set this element's colour
-			self.style.hilite = {255,255,255,255}
-			self.style.focus = {255,255,255,255}
-			self.style.fg = {0,0,0,255}
-		end
-		table.insert( glyphButtons, glyphButton )
-	end
-	
 	local fontOptionsList = gui:group( "Font options", {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()/2} )
 	fontOptionsList:setfont(12)
 	local y = 20
@@ -117,6 +92,36 @@ function love.load()
 	addGlyphOptionElement( "width", nil, 1 )
 	addGlyphOptionElement( "height", nil, 1 )
 	addGlyphOptionElement( "advance", nil, 1 )
+	
+	local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()} )
+	glyphsList.scrollv.style.hs = "auto"
+	glyphsList:setfont(24)
+	local glyphButtons = {}
+	for i = 32, 126 do
+		local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
+		glyphButton.click = function(self, x, y, button)
+			if not fnt then return end
+			switchGlyph(self.label)
+			
+			-- Reset colours of other elements
+			for _, btn in ipairs(glyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
+			end
+			
+			-- Set this element's colour
+			self.style.hilite = {255,255,255,255}
+			self.style.focus = {255,255,255,255}
+			self.style.fg = {0,0,0,255}
+			
+			-- Update glyph options
+			for _, option in ipairs(glyphOptionsList.children) do
+				option.value = tostring( selectedGlyph[option.label] )
+			end
+		end
+		table.insert( glyphButtons, glyphButton )
+	end
 end
 
 function love.update(dt)

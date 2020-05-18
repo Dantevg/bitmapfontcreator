@@ -45,7 +45,7 @@ end
 
 -- Set the pixel at position (x,y) to value
 function glyph:setPixel( x, y, value )
-	if x < 0 or x >= self.width or y < 0 or y >= self.width then
+	if x < 0 or x >= self.width or y < 0 or y >= self.height then
 		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	

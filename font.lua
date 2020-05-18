@@ -211,6 +211,43 @@ function font:generateXML( what, ... )
 	return font.outputfiles[what]( self, ... )
 end
 
+function font:save(path)
+	if type(path) ~= "string" then
+		error("Expected path")
+	end
+	
+	local info = love.filesystem.getInfo(path)
+	if info and info.type ~= "directory" then
+		error("Path is not a directory")
+	elseif not info then
+		path = path.."/"..self.family..".ufo"
+		love.filesystem.createDirectory(path)
+	end
+	
+	love.filesystem.write( path.."/metainfo.plist", self:generateXML("metainfo") )
+	love.filesystem.write( path.."/fontinfo.plist", self:generateXML("fontinfo") )
+	love.filesystem.write( path.."/layercontents.plist", self:generateXML("layercontents") )
+	
+	love.filesystem.createDirectory(path.."/images")
+	
+	for _, layer in ipairs(self.layers) do
+		local path = path.."/"..layer.directory
+		love.filesystem.createDirectory(path)
+		love.filesystem.write( path.."/contents.plist", self:generateXML( "glyphs_contents", layer ) )
+		for _, glyph in ipairs(layer.glyphs) do
+			-- Save image
+			local imagePath = path.."/"..layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png"
+			glyph.imageData:encode( "png", imagePath )
+			
+			-- Save glyph xml
+			local path = path.."/"..ufo.convertToFilename(glyph.name)..".glif"
+			love.filesystem.write( path, self:generateXML( "glif", glyph ) )
+		end
+	end
+	
+	return path
+end
+
 
 
 -- RETURN

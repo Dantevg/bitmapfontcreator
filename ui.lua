@@ -25,7 +25,7 @@ loadFontButton.click = function(self)
 end
 
 saveFontButton.click = function(self)
-	fnt:save("fnt")
+	fnt:save("fnt.ufo")
 end
 
 

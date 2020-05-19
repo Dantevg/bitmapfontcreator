@@ -26,7 +26,7 @@ end
 function glyph:getContours()
 	local contours = {}
 	
-	self.imageData:mapPixel(function( x, y, v )
+	self.imageData:mapPixel(function( x, y, v, ... )
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
@@ -37,7 +37,7 @@ function glyph:getContours()
 			} )
 		end
 		
-		return v -- Return original colour, as ImageData:mapPixel expects it
+		return v, ... -- Return original colour, as ImageData:mapPixel expects it
 	end)
 	
 	return contours

@@ -220,7 +220,6 @@ function font:save(path)
 	if info and info.type ~= "directory" then
 		error("Path is not a directory")
 	elseif not info then
-		path = path.."/"..self.family..".ufo"
 		love.filesystem.createDirectory(path)
 	end
 	
@@ -231,12 +230,13 @@ function font:save(path)
 	love.filesystem.createDirectory(path.."/images")
 	
 	for _, layer in ipairs(self.layers) do
+		local imagePath = path.."/images"
 		local path = path.."/"..layer.directory
 		love.filesystem.createDirectory(path)
 		love.filesystem.write( path.."/contents.plist", self:generateXML( "glyphs_contents", layer ) )
 		for _, glyph in ipairs(layer.glyphs) do
 			-- Save image
-			local imagePath = path.."/"..layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png"
+			local imagePath = imagePath.."/"..layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png"
 			glyph.imageData:encode( "png", imagePath )
 			
 			-- Save glyph xml

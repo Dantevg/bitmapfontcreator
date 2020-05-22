@@ -61,7 +61,10 @@ addFontOptionElement("trademark")
 
 -- GLYPH OPTIONS (bottom right)
 
-local glyphOptionsList = gui:group( "Glyph options", {love.graphics.getWidth()-200, love.graphics.getHeight()/2, 200, love.graphics.getHeight()/2} )
+local glyphOptionsList = gui:group("Glyph options", {
+	love.graphics.getWidth()-200, love.graphics.getHeight()/2,
+	200,                          love.graphics.getHeight()/2
+} )
 glyphOptionsList:setfont(12)
 y = 20
 
@@ -86,11 +89,18 @@ addGlyphOptionElement( "height", nil, 1 )
 addGlyphOptionElement( "advance", nil, 1 )
 
 local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
-applyToAllButton.click = function( self, x, y, btn )
+applyToAllButton.click = function()
 	for _, glyph in ipairs(selectedLayer.glyphs) do
 		glyph:resize( selectedGlyph.width, selectedGlyph.height )
 		glyph.advance = selectedGlyph.advance
 	end
+end
+y = y+30
+
+local clearGlyphButton = gui:button( "Clear glyph", {10, y, 180, 20}, glyphOptionsList )
+clearGlyphButton.click = function()
+	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0 end)
+	selectedGlyph.image = nil
 end
 
 
@@ -106,7 +116,7 @@ local glyphButtons = {}
 
 for i = 32, 126 do
 	local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
-	glyphButton.click = function(self, x, y, button)
+	glyphButton.click = function(self)
 		if not fnt then return end
 		switchGlyph(self.label)
 		

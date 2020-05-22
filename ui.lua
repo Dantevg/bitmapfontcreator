@@ -85,6 +85,15 @@ addGlyphOptionElement( "width", nil, 1 )
 addGlyphOptionElement( "height", nil, 1 )
 addGlyphOptionElement( "advance", nil, 1 )
 
+local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
+applyToAllButton.click = function( self, x, y, btn )
+	for _, glyph in ipairs(selectedLayer.glyphs) do
+		glyph.width = selectedGlyph.width
+		glyph.height = selectedGlyph.height
+		glyph.advance = selectedGlyph.advance
+	end
+end
+
 
 
 

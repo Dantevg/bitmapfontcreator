@@ -70,6 +70,7 @@ function switchGlyph(char)
 	for _, glyph in ipairs( selectedLayer.glyphs ) do
 		if glyph.char == char then
 			selectedGlyph = glyph
+			print("Selected glyph "..selectedGlyph.name)
 			break
 		end
 	end

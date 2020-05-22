@@ -21,11 +21,13 @@ local loadFontButton = gui:button( "Load", {0, 0, 100, 50}, actionsList )
 local saveFontButton = gui:button( "Save", {110, 0, 100, 50}, actionsList )
 
 loadFontButton.click = function(self)
-	
+	print("Load font")
 end
 
 saveFontButton.click = function(self)
+	io.write("Saving font... ")
 	fnt:save()
+	io.write("Done.\n")
 end
 
 
@@ -42,6 +44,7 @@ local function addFontOptionElement( location, label )
 	local input = gui:input( label or location, {0, y, 200, 20}, fontOptionsList, fnt[location] )
 	input.done = function(self)
 		fnt[location] = self.value
+		print("Set font."..location.." to "..self.value)
 		self.Gspot:unfocus()
 	end
 	y = y+30
@@ -71,6 +74,7 @@ y = 20
 local function addGlyphOptionElement( location, label, value )
 	local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList, value )
 	input.done = function(self)
+		print("Set glyph."..location.." to "..self.value)
 		selectedGlyph[location] = tonumber(self.value)
 		if self.label == "width" or self.label == "height" then
 			selectedGlyph:resize()
@@ -90,6 +94,7 @@ addGlyphOptionElement( "advance", nil, 1 )
 
 local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
 applyToAllButton.click = function()
+	print("Apply glyph options to all")
 	for _, glyph in ipairs(selectedLayer.glyphs) do
 		glyph:resize( selectedGlyph.width, selectedGlyph.height )
 		glyph.advance = selectedGlyph.advance
@@ -99,6 +104,7 @@ y = y+30
 
 local clearGlyphButton = gui:button( "Clear glyph", {10, y, 180, 20}, glyphOptionsList )
 clearGlyphButton.click = function()
+	print("Clear glyph")
 	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0 end)
 	selectedGlyph.image = nil
 end

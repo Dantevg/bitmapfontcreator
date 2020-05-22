@@ -28,8 +28,8 @@ function font.new(options)
 	-- Pre-fill glyphs array with empty glyphs
 	for i = 32, 126 do
 		table.insert( fnt.layers[1].glyphs, glyph{
-			name = string.char(i),
-			unicode = tostring(i), -- TODO: left-pad with 0's
+			char = string.char(i),
+			unicode = i,
 			width = 1, -- Default empty width
 			height = fnt.height or 1, -- Default empty height
 			advance = 1, -- Default empty advance
@@ -194,7 +194,7 @@ function font.outputfiles.glif( fnt, glyph )
 		attr = {name = glyph.name, format = 2},
 		{
 			name = "unicode",
-			attr = { hex = glyph.unicode }
+			attr = { hex = string.format( "%04.x", glyph.unicode ) }
 		},
 		{
 			name = "outline",

@@ -5,14 +5,18 @@
 	
 ]]--
 
+local aglfn = require "lib/aglfn"
+
 local glyph = {}
 
 function glyph.new(options)
 	if not options then error("Expected options") end
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
+	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
 	return setmetatable( {
-		name = options.name,
-		unicode = options.unicode,
+		char = options.char or aglfn.getChar(unicode),
+		name = options.name or aglfn.getName(unicode),
+		unicode = unicode,
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,

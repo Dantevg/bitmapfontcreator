@@ -30,7 +30,7 @@ local scale = 50
 function love.load()
 	love.graphics.setDefaultFilter( "nearest", "nearest" ) -- Prevent blurry glyph scaling
 	
-	fnt = font({family = "My Font!"})
+	fnt = font({family = "test"})
 	fnt.author = "nl.dantevg"
 	
 	selectedLayer = fnt.layers[1]

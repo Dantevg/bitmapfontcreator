@@ -130,6 +130,8 @@ for i = 32, 126 do
 	table.insert( glyphButtons, glyphButton )
 end
 
+glyphButtons[1]:click() -- Make sure first glyph is selected visually
+
 
 
 

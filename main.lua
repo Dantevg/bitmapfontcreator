@@ -25,7 +25,6 @@ local font = require "font"
 local gui
 
 -- local fnt, selectedGlyph, selectedLayer
-local redrawGlyph = true
 local scale = 50
 
 function love.load()

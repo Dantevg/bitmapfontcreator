@@ -61,7 +61,7 @@ end
 
 function love.draw()
 	if fnt then
-		love.graphics.draw( selectedGlyph:getImage(), 65, 0, 0, math.floor(scale), math.floor(scale) )
+		love.graphics.draw( selectedGlyph:getImage(), 66, 0, 0, math.floor(scale), math.floor(scale) )
 	end
 	
 	gui:draw()
@@ -86,7 +86,7 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	x = math.floor((x-65)/scale)
+	x = math.floor((x-66)/scale)
 	y = math.floor(y/scale)
 	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
 		selectedGlyph:setPixel( x, y, btn==1 )
@@ -98,5 +98,5 @@ end
 function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
 	
-	scale = math.min( math.max( 1, scale + y*scale*0.05 ), 200 )
+	scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
 end

@@ -20,6 +20,7 @@ function font.new(options)
 		height = options.height,
 		style = options.style or "regular",
 		version = options.version or "1.0",
+		scale = 100,
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},
@@ -170,7 +171,7 @@ function font.outputfiles.glyphs_contents( fnt, layer )
 	local glyphs = {}
 	
 	for _, v in pairs(layer.glyphs) do
-		glyphs[v.name] = v.path
+		glyphs[v.name] = ufo.convertToFilename(v.name)..".glif"
 	end
 	
 	return ufo.plistHeader.."\n"..ufo.toXML(
@@ -197,8 +198,12 @@ function font.outputfiles.glif( fnt, glyph )
 			attr = { hex = string.format( "%04x", glyph.unicode ) }
 		},
 		{
+			name = "advance",
+			attr = { width = glyph.advance*fnt.scale }
+		},
+		{
 			name = "outline",
-			unpack( glyph:getContours() )
+			unpack( glyph:getContours(fnt.scale) )
 		},
 	}
 end

@@ -27,17 +27,17 @@ end
 
 -- Returns the contours of the glyph, pixel by pixel
 -- TODO: optimize
-function glyph:getContours()
+function glyph:getContours(scale)
 	local contours = {}
 	
 	self.imageData:mapPixel(function( x, y, v, ... )
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
-				{ name = "point", attr = {x=x,   y=y,   type="line"} },
-				{ name = "point", attr = {x=x+1, y=y,   type="line"} },
-				{ name = "point", attr = {x=x+1, y=y+1, type="line"} },
-				{ name = "point", attr = {x=x,   y=y+1, type="line"} },
+				{ name = "point", attr = {x=x*scale,     y=y*scale,     type="line"} },
+				{ name = "point", attr = {x=(x+1)*scale, y=y*scale,     type="line"} },
+				{ name = "point", attr = {x=(x+1)*scale, y=(y+1)*scale, type="line"} },
+				{ name = "point", attr = {x=x*scale,     y=(y+1)*scale, type="line"} },
 			} )
 		end
 		

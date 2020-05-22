@@ -19,6 +19,7 @@ local actionsList = gui:group( "Actions", {65, love.graphics.getHeight()-50, lov
 actionsList:setfont(12)
 local loadFontButton = gui:button( "Load", {0, 0, 100, 50}, actionsList )
 local saveFontButton = gui:button( "Save", {110, 0, 100, 50}, actionsList )
+local compileFontButton = gui:button( "Compile", {220, 0, 100, 50}, actionsList )
 
 loadFontButton.click = function(self)
 	print("Load font")
@@ -28,6 +29,16 @@ saveFontButton.click = function(self)
 	io.write("Saving font... ")
 	fnt:save()
 	io.write("Done.\n")
+end
+
+compileFontButton.click = function(self)
+	print("Compile font")
+	local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
+	local inputPath = love.filesystem.getSaveDirectory().."/"..fnt.family..".ufo"
+	local outputPath = love.filesystem.getSaveDirectory().."/"..fnt.family..".ttf"
+	local command = "fontmake -u "..inputPath.." --output-path "..outputPath
+	print("Running "..command)
+	os.execute(command)
 end
 
 

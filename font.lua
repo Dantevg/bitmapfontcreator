@@ -212,16 +212,15 @@ function font:generateXML( what, ... )
 end
 
 function font:save(path)
-	if type(path) ~= "string" then
-		error("Expected path")
-	end
+	path = path or ""
 	
 	local info = love.filesystem.getInfo(path)
-	if info and info.type ~= "directory" then
+	if info and info.type ~= "directory" then     -- Is a file
 		error("Path is not a directory")
-	elseif not info then
-		love.filesystem.createDirectory(path)
+	elseif info and info.type == "directory" and path:match("/(.+)") ~= self.family..".ufo" then
+		path = path.."/"..self.family..".ufo" -- Is a folder, place .ufo inside folder
 	end
+	love.filesystem.createDirectory(path) -- Create .ufo directory
 	
 	love.filesystem.write( path.."/metainfo.plist", self:generateXML("metainfo") )
 	love.filesystem.write( path.."/fontinfo.plist", self:generateXML("fontinfo") )

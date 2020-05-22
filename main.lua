@@ -36,17 +36,9 @@ function love.load()
 	selectedLayer = fnt.layers[1]
 	selectedGlyph = selectedLayer.glyphs[1]
 	
-	print("\n-----\nmetainfo.plist\n")
-	print( fnt:generateXML("metainfo") )
-	print("\n-----\nfontinfo.plist\n")
-	print( fnt:generateXML("fontinfo") )
-	print("\n-----\nlayercontents.plist\n")
-	print( fnt:generateXML("layercontents") )
-	print("\n-----\nglyphs/contents.plist\n")
-	print( fnt:generateXML("glyphs_contents", selectedLayer) )
-	
-	handler = require "lib/xmlhandler/dom"
-	xml.parser(handler):parse( fnt:generateXML("metainfo") )
+	print("Welcome to BitmapFontCreator")
+	print("============================")
+	print()
 	
 	gui = require "ui"
 end

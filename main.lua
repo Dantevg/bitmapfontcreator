@@ -76,6 +76,14 @@ function switchGlyph(char)
 	end
 end
 
+function toCanvasCoords( x, y )
+	x = math.floor((x-66)/scale)
+	y = math.floor(y/scale)
+	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
+		return x, y
+	end
+end
+
 -- Forward love2d events to Gspot GUI
 function love.keypressed(key)
 	gui:keypress(key)
@@ -86,9 +94,8 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	x = math.floor((x-66)/scale)
-	y = math.floor(y/scale)
-	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
+	x, y = toCanvasCoords( x, y )
+	if x then
 		selectedGlyph:setPixel( x, y, btn==1 )
 	end
 end
@@ -99,4 +106,12 @@ function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
 	
 	scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
+end
+function love.mousemoved( x, y )
+	x, y = toCanvasCoords( x, y )
+	if x and love.mouse.isDown(1) then
+		selectedGlyph:setPixel( x, y, true )
+	elseif x and love.mouse.isDown(2) then
+		selectedGlyph:setPixel( x, y, false )
+	end
 end

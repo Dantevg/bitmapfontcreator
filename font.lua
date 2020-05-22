@@ -194,7 +194,7 @@ function font.outputfiles.glif( fnt, glyph )
 		attr = {name = glyph.name, format = 2},
 		{
 			name = "unicode",
-			attr = { hex = string.format( "%04.x", glyph.unicode ) }
+			attr = { hex = string.format( "%04x", glyph.unicode ) }
 		},
 		{
 			name = "outline",

@@ -97,8 +97,8 @@ function font.outputfiles.fontinfo(fnt)
 	info.familyName = fnt.family
 	info.styleName = fnt.style
 	if fnt.version then
-		info.versionMajor = fnt.version:match("[^%.]+")
-		info.versionMinor = fnt.version:match("%.(.+)")
+		info.versionMajor = tonumber( fnt.version:match("[^%.]+") )
+		info.versionMinor = tonumber( fnt.version:match("%.(.+)") )
 	end
 	info.year = fnt.year
 	

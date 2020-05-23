@@ -12,6 +12,8 @@ local glyph = {}
 function glyph.new(options)
 	if not options then error("Expected options") end
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
+	imageData:mapPixel(function() return 0, 0, 0 end)
+	
 	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
 	return setmetatable( {
 		char = options.char or aglfn.getChar(unicode),
@@ -74,12 +76,18 @@ end
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
 	width, height = width or self.width, height or self.height
-	self.width, self.height = width, height
-	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
-	canvas:renderTo(function()
-		love.graphics.draw( self:getImage() )
+	
+	local newImageData = love.image.newImageData( width, height )
+	newImageData:mapPixel(function( x, y )
+		if x < self.imageData:getWidth() and y < self.imageData:getHeight() then
+			return self.imageData:getPixel(x,y)
+		else
+			return 0, 0, 0
+		end
 	end)
-	self.imageData = canvas:newImageData()
+	
+	self.width, self.height = width, height
+	self.imageData = newImageData
 	self.image = nil
 end
 

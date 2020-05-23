@@ -31,9 +31,9 @@ function font.new(options)
 		table.insert( fnt.layers[1].glyphs, glyph{
 			char = string.char(i),
 			unicode = i,
-			width = 5, -- Default empty width
+			width = 5,                -- Default empty width
 			height = fnt.height or 7, -- Default empty height
-			advance = 8, -- Default empty advance
+			advance = 6,              -- Default empty advance
 		} )
 	end
 	
@@ -224,7 +224,7 @@ function font:save(path)
 	path = path or ""
 	
 	local info = love.filesystem.getInfo(path)
-	if info and info.type ~= "directory" then     -- Is a file
+	if info and info.type ~= "directory" then -- Is a file
 		error("Path is not a directory")
 	elseif info and info.type == "directory" and path:match("/(.+)") ~= self.family..".ufo" then
 		path = path.."/"..self.family..".ufo" -- Is a folder, place .ufo inside folder
@@ -259,6 +259,7 @@ end
 
 
 -- RETURN
+
 return setmetatable( font, {
 	__call = function( _, ... )
 		return font.new(...)

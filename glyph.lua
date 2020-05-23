@@ -12,9 +12,8 @@ local glyph = {}
 function glyph.new(options)
 	if not options then error("Expected options") end
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
-	-- imageData:mapPixel(function() return 0, 0, 0 end)
-	
 	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
+	
 	return setmetatable( {
 		char = options.char or aglfn.getChar(unicode),
 		name = options.name or aglfn.getName(unicode),
@@ -73,6 +72,7 @@ function glyph:getImage()
 	return self.image
 end
 
+-- Returns a scaled up version of the glyph image
 function glyph:getImageScaled(scale)
 	local canvas = love.graphics.newCanvas( self.imageData:getWidth()*scale, self.imageData:getHeight()*scale )
 	canvas:renderTo(function()

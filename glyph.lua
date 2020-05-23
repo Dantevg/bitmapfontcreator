@@ -12,7 +12,7 @@ local glyph = {}
 function glyph.new(options)
 	if not options then error("Expected options") end
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
-	imageData:mapPixel(function() return 0, 0, 0 end)
+	-- imageData:mapPixel(function() return 0, 0, 0 end)
 	
 	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
 	return setmetatable( {
@@ -55,7 +55,7 @@ function glyph:setPixel( x, y, value )
 		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
 	end
 	
-	self.imageData:setPixel( x, y, unpack(value and {1,1,1} or {0,0,0}) )
+	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	
 	self.image = nil -- To regenerate the image for drawing
 end
@@ -84,18 +84,12 @@ end
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
 	width, height = width or self.width, height or self.height
-	
-	local newImageData = love.image.newImageData( width, height )
-	newImageData:mapPixel(function( x, y )
-		if x < self.imageData:getWidth() and y < self.imageData:getHeight() then
-			return self.imageData:getPixel(x,y)
-		else
-			return 0, 0, 0
-		end
-	end)
-	
 	self.width, self.height = width, height
-	self.imageData = newImageData
+	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
+	canvas:renderTo(function()
+		love.graphics.draw( self:getImage() )
+	end)
+	self.imageData = canvas:newImageData()
 	self.image = nil
 end
 

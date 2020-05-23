@@ -183,7 +183,12 @@ function updatePreview()
 	glyphPreview4x:setimage( selectedGlyph:getImageScaled(4) )
 	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
 	
-	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(6) )
+	local maxScale = math.huge
+	for _, glyph in ipairs(selectedLayer.glyphs) do
+		maxScale = math.min( maxScale, 40/glyph.width, 40/glyph.height )
+	end
+	
+	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(maxScale) )
 end
 
 

@@ -77,8 +77,8 @@ function switchGlyph(char)
 end
 
 function toCanvasCoords( x, y )
-	x = math.floor((x-glyphListWidth-16)/scale)
-	y = math.floor(y/scale)
+	x = math.floor((x-glyphListWidth-16)/math.floor(scale))
+	y = math.floor(y/math.floor(scale))
 	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
 		return x, y
 	end

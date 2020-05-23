@@ -9,6 +9,8 @@
 
 local gui = require("lib/Gspot"):setComponentMax(255)
 
+function updatePreview() end
+
 
 
 
@@ -120,16 +122,15 @@ y = y+30
 local clearGlyphButton = gui:button( "Clear glyph", {10, y, 180, 20}, glyphOptionsList )
 clearGlyphButton.click = function()
 	print("Clear glyph")
-	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0 end)
+	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
 	selectedGlyph.image = nil
+	updatePreview()
 end
 y = y+30
 
 local glyphPreview = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage() )
 local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(2) )
 local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(4) )
-
-function updatePreview() end
 
 
 

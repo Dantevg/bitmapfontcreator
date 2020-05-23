@@ -189,7 +189,7 @@ function updatePreviews()
 		maxScale = math.min( maxScale, 40/glyph.width, 40/glyph.height )
 	end
 	
-	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(maxScale) )
+	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(math.floor(maxScale)) )
 end
 
 

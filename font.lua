@@ -181,7 +181,7 @@ function font.outputfiles.glyphs_contents( fnt, layer )
 	)
 end
 
-function font.outputfiles.glif( fnt, glyph )
+function font.outputfiles.glif( fnt, layer, glyph )
 	if not glyph then error("Expected glyph") end
 	if not glyph.name or #glyph.name < 1 then
 		return false, "Glyph name must be present and not empty"
@@ -200,6 +200,10 @@ function font.outputfiles.glif( fnt, glyph )
 		{
 			name = "advance",
 			attr = { width = glyph.advance*fnt.scale }
+		},
+		{
+			name = "image",
+			attr = { fileName = layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png" }
 		},
 		{
 			name = "outline",
@@ -245,7 +249,7 @@ function font:save(path)
 			
 			-- Save glyph xml
 			local path = path.."/"..ufo.convertToFilename(glyph.name)..".glif"
-			love.filesystem.write( path, self:generateXML( "glif", glyph ) )
+			love.filesystem.write( path, self:generateXML( "glif", layer, glyph ) )
 		end
 	end
 	

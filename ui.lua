@@ -15,7 +15,10 @@ local gui = require("lib/Gspot"):setComponentMax(255)
 
 -- ACTIONS (bottom)
 
-local actionsList = gui:group( "Actions", {65, love.graphics.getHeight()-50, love.graphics.getWidth()-200-65, 50} )
+local actionsList = gui:group( "Actions", {
+	glyphListWidth+16, love.graphics.getHeight()-50, 
+	love.graphics.getWidth()-200-glyphListWidth-16, 50
+} )
 actionsList:setfont(12)
 local loadFontButton = gui:button( "Load", {0, 0, 100, 50}, actionsList )
 local saveFontButton = gui:button( "Save", {110, 0, 100, 50}, actionsList )
@@ -75,7 +78,7 @@ addFontOptionElement("trademark")
 
 -- GLYPH OPTIONS (bottom right)
 
-local glyphOptionsList = gui:group("Glyph options", {
+local glyphOptionsList = gui:group( "Glyph options", {
 	love.graphics.getWidth()-200, love.graphics.getHeight()/2,
 	200,                          love.graphics.getHeight()/2
 } )
@@ -126,13 +129,7 @@ local glyphPreview = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:ge
 local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(2) )
 local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(4) )
 
-function updatePreview()
-	glyphPreview:setimage( selectedGlyph:getImage() )
-	glyphPreview2x:setimage( selectedGlyph:getImageScaled(2) )
-	glyphPreview2x.pos.x = 20 + selectedGlyph.width
-	glyphPreview4x:setimage( selectedGlyph:getImageScaled(4) )
-	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
-end
+function updatePreview() end
 
 
 
@@ -140,10 +137,11 @@ end
 
 -- GLYPHS (left)
 
-local glyphsList = gui:scrollgroup( nil, {0, 0, 50, love.graphics.getHeight()}, nil, "vertical" )
+local glyphsList = gui:scrollgroup( nil, {0, 0, glyphListWidth, love.graphics.getHeight()}, nil, "vertical" )
 glyphsList.scrollv.style.hs = "auto"
 glyphsList:setfont(24)
 local glyphButtons = {}
+local glyphImages = {}
 
 for i = 32, 126 do
 	local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
@@ -171,10 +169,22 @@ for i = 32, 126 do
 		end
 		updatePreview()
 	end
+	local glyphImage = gui:image( nil, {60, (i-32)*50, 50, 50}, glyphsList )
 	table.insert( glyphButtons, glyphButton )
+	glyphImages[ string.char(i) ] = glyphImage
 end
 
 glyphButtons[1]:click() -- Make sure first glyph is selected visually
+
+function updatePreview()
+	glyphPreview:setimage( selectedGlyph:getImage() )
+	glyphPreview2x:setimage( selectedGlyph:getImageScaled(2) )
+	glyphPreview2x.pos.x = 20 + selectedGlyph.width
+	glyphPreview4x:setimage( selectedGlyph:getImageScaled(4) )
+	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
+	
+	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(6) )
+end
 
 
 

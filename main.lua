@@ -25,6 +25,7 @@ local font = require "font"
 local gui
 
 -- local fnt, selectedGlyph, selectedLayer
+glyphListWidth = 100
 local scale = 50
 
 function love.load()
@@ -54,7 +55,12 @@ function love.draw()
 	love.graphics.clear( 0.1, 0.1, 0.1 )
 	
 	if fnt then
-		love.graphics.draw( selectedGlyph:getImage(), 66, 0, 0, math.floor(scale), math.floor(scale) )
+		love.graphics.setColor( 0, 0, 0 )
+		love.graphics.rectangle( "fill", glyphListWidth+16, 0,
+			selectedGlyph.width*math.floor(scale),
+			selectedGlyph.height*math.floor(scale) )
+		love.graphics.setColor( 1, 1, 1 )
+		love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
 	end
 	
 	gui:draw()
@@ -71,7 +77,7 @@ function switchGlyph(char)
 end
 
 function toCanvasCoords( x, y )
-	x = math.floor((x-66)/scale)
+	x = math.floor((x-glyphListWidth-16)/scale)
 	y = math.floor(y/scale)
 	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
 		return x, y
@@ -100,7 +106,7 @@ end
 function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
 	
-	if love.mouse.getX() > 65 and love.mouse.getX() < love.graphics.getWidth()-200
+	if love.mouse.getX() > glyphListWidth+16 and love.mouse.getX() < love.graphics.getWidth()-200
 	and love.mouse.getY() < love.graphics.getHeight()-50 then
 		scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
 	end

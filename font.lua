@@ -31,9 +31,9 @@ function font.new(options)
 		table.insert( fnt.layers[1].glyphs, glyph{
 			char = string.char(i),
 			unicode = i,
-			width = 1, -- Default empty width
-			height = fnt.height or 1, -- Default empty height
-			advance = 1, -- Default empty advance
+			width = 5, -- Default empty width
+			height = fnt.height or 7, -- Default empty height
+			advance = 8, -- Default empty advance
 		} )
 	end
 	

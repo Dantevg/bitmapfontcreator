@@ -97,7 +97,10 @@ end
 function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
 	
-	scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
+	if love.mouse.getX() > 65 and love.mouse.getX() < love.graphics.getWidth()-200
+	and love.mouse.getY() < love.graphics.getHeight()-50 then
+		scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
+	end
 end
 function love.mousemoved( x, y )
 	x, y = toCanvasCoords( x, y )

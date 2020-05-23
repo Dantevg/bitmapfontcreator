@@ -51,6 +51,8 @@ function love.update(dt)
 end
 
 function love.draw()
+	love.graphics.clear( 0.1, 0.1, 0.1 )
+	
 	if fnt then
 		love.graphics.draw( selectedGlyph:getImage(), 66, 0, 0, math.floor(scale), math.floor(scale) )
 	end
@@ -89,6 +91,7 @@ function love.mousepressed( x, y, btn )
 	x, y = toCanvasCoords( x, y )
 	if x then
 		selectedGlyph:setPixel( x, y, btn==1 )
+		updatePreview()
 	end
 end
 function love.mousereleased( x, y, btn )
@@ -106,7 +109,9 @@ function love.mousemoved( x, y )
 	x, y = toCanvasCoords( x, y )
 	if x and love.mouse.isDown(1) then
 		selectedGlyph:setPixel( x, y, true )
+		updatePreview()
 	elseif x and love.mouse.isDown(2) then
 		selectedGlyph:setPixel( x, y, false )
+		updatePreview()
 	end
 end

@@ -186,7 +186,7 @@ function updatePreviews()
 	
 	local maxScale = math.huge
 	for _, glyph in ipairs(selectedLayer.glyphs) do
-		maxScale = math.min( maxScale, 40/glyph.width, 40/glyph.height )
+		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
 	end
 	
 	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(math.floor(maxScale)) )

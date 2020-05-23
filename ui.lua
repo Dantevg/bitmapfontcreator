@@ -89,6 +89,7 @@ local function addGlyphOptionElement( location, label, value )
 		selectedGlyph[location] = tonumber(self.value)
 		if self.label == "width" or self.label == "height" then
 			selectedGlyph:resize()
+			updatePreview()
 		end
 		self.Gspot:unfocus()
 	end
@@ -118,6 +119,19 @@ clearGlyphButton.click = function()
 	print("Clear glyph")
 	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0 end)
 	selectedGlyph.image = nil
+end
+y = y+30
+
+local glyphPreview = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage() )
+local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(2) )
+local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(4) )
+
+function updatePreview()
+	glyphPreview:setimage( selectedGlyph:getImage() )
+	glyphPreview2x:setimage( selectedGlyph:getImageScaled(2) )
+	glyphPreview2x.pos.x = 20 + selectedGlyph.width
+	glyphPreview4x:setimage( selectedGlyph:getImageScaled(4) )
+	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
 end
 
 
@@ -151,8 +165,11 @@ for i = 32, 126 do
 		
 		-- Update glyph options
 		for _, option in ipairs(glyphOptionsList.children) do
-			option.value = tostring( selectedGlyph[option.label] )
+			if option.elementtype == "input" then
+				option.value = tostring( selectedGlyph[option.label] )
+			end
 		end
+		updatePreview()
 	end
 	table.insert( glyphButtons, glyphButton )
 end

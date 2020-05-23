@@ -170,7 +170,7 @@ for i = 32, 126 do
 		end
 		updatePreview()
 	end
-	local glyphImage = gui:image( nil, {60, (i-32)*50, 50, 50}, glyphsList )
+	local glyphImage = gui:image( nil, {60, (i-32)*50+5, 50, 50}, glyphsList )
 	table.insert( glyphButtons, glyphButton )
 	glyphImages[ string.char(i) ] = glyphImage
 end

@@ -97,7 +97,7 @@ function love.mousepressed( x, y, btn )
 	x, y = toCanvasCoords( x, y )
 	if x then
 		selectedGlyph:setPixel( x, y, btn==1 )
-		updatePreview()
+		updatePreviews()
 	end
 end
 function love.mousereleased( x, y, btn )
@@ -115,9 +115,14 @@ function love.mousemoved( x, y )
 	x, y = toCanvasCoords( x, y )
 	if x and love.mouse.isDown(1) then
 		selectedGlyph:setPixel( x, y, true )
-		updatePreview()
+		updatePreviews()
 	elseif x and love.mouse.isDown(2) then
 		selectedGlyph:setPixel( x, y, false )
-		updatePreview()
+		updatePreviews()
 	end
+end
+function love.resize()
+	package.loaded.ui = nil
+	gui = require "ui"
+	updatePreviews()
 end

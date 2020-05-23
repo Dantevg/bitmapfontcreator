@@ -9,7 +9,7 @@
 
 local gui = require("lib/Gspot"):setComponentMax(255)
 
-function updatePreview() end
+function updatePreviews() end
 
 
 
@@ -94,7 +94,7 @@ local function addGlyphOptionElement( location, label, value )
 		selectedGlyph[location] = tonumber(self.value)
 		if self.label == "width" or self.label == "height" then
 			selectedGlyph:resize()
-			updatePreview()
+			updatePreviews()
 		end
 		self.Gspot:unfocus()
 	end
@@ -124,7 +124,7 @@ clearGlyphButton.click = function()
 	print("Clear glyph")
 	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
 	selectedGlyph.image = nil
-	updatePreview()
+	updatePreviews()
 end
 y = y+30
 
@@ -168,7 +168,7 @@ for i = 32, 126 do
 				option.value = tostring( selectedGlyph[option.label] )
 			end
 		end
-		updatePreview()
+		updatePreviews()
 	end
 	local glyphImage = gui:image( nil, {60, (i-32)*50+5, 50, 50}, glyphsList )
 	table.insert( glyphButtons, glyphButton )
@@ -177,7 +177,7 @@ end
 
 glyphButtons[1]:click() -- Make sure first glyph is selected visually
 
-function updatePreview()
+function updatePreviews()
 	glyphPreview:setimage( selectedGlyph:getImage() )
 	glyphPreview2x:setimage( selectedGlyph:getImageScaled(2) )
 	glyphPreview2x.pos.x = 20 + selectedGlyph.width

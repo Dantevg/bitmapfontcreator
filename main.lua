@@ -71,7 +71,7 @@ function love.draw()
 		love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
 		
 		-- Draw font preview
-		local sentence = ("The quick brown fox jumps over the lazy dog."):upper()
+		local sentence = "The quick brown fox jumps over the lazy dog."
 		local x = glyphListWidth+21
 		for i = 1, #sentence do
 			local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )

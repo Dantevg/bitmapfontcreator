@@ -142,6 +142,7 @@ local glyphsList = gui:scrollgroup( nil, {0, 0, glyphListWidth, love.graphics.ge
 glyphsList.scrollv.style.hs = "auto"
 glyphsList:setfont(24)
 local glyphButtons = {}
+local glyphCodepoints = {}
 local glyphImages = {}
 
 for i, glyph in ipairs(selectedLayer.glyphs) do
@@ -170,6 +171,10 @@ for i, glyph in ipairs(selectedLayer.glyphs) do
 		end
 		updatePreviews()
 	end
+	
+	local glyphCodepoint = gui:text( string.format("0x%X",glyph.unicode), {0, (i-1)*50+35, 50, 50}, glyphsList )
+	glyphCodepoint:setfont(10)
+	
 	local glyphImage = gui:image( nil, {60, (i-1)*50+5, 50, 50}, glyphsList )
 	table.insert( glyphButtons, glyphButton )
 	glyphImages[glyph] = glyphImage

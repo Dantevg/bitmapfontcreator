@@ -6,6 +6,7 @@
 ]]--
 
 local utf8 = require "utf8"
+local aglfn = require "lib/aglfn"
 local ufo = require "lib/ufo"
 local xml = require "lib/xml2lua"
 local glyph = require "glyph"
@@ -37,9 +38,10 @@ function font.new(options)
 		} )
 	end
 	
-	-- Pre-fill glyphs array with empty glyphs
-	for i = 32, 126 do addGlyph(i) end  -- ISO-8859-1, ASCII
-	for i = 161, 255 do addGlyph(i) end -- ISO-8859-1
+	-- Pre-fill glyphs array with empty glyphs (the ones which have a name in aglfn, at least)
+	for i = 32, 255 do
+		if aglfn.getName(i) then addGlyph(i) end
+	end
 	
 	return setmetatable( fnt, {__index = font} )
 end

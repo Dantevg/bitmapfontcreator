@@ -69,20 +69,18 @@ function love.draw()
 		-- Draw glyph
 		love.graphics.setColor( 1, 1, 1 )
 		love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
+		
+		-- Draw font preview
+		local sentence = ("The quick brown fox jumps over the lazy dog."):upper()
+		local x = glyphListWidth+21
+		for i = 1, #sentence do
+			local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
+			love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-70, 0, 2, 2 )
+			x = x+glyph.advance*2
+		end
 	end
 	
 	gui:draw()
-end
-
--- Update selected glyph
-function switchGlyph(char)
-	for _, glyph in ipairs( selectedLayer.glyphs ) do
-		if glyph.char == char then
-			selectedGlyph = glyph
-			print("Selected glyph "..selectedGlyph.name)
-			break
-		end
-	end
 end
 
 -- Convert screen coordinates to glyph image / canvas coordinates

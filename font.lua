@@ -260,6 +260,16 @@ function font:save(path)
 	return path
 end
 
+function font:getGlyph( layer, unicode )
+	if type(input) == "string" then
+		unicode = aglfn.getCodepoint(unicode)
+	end
+	
+	for _, glyph in ipairs(layer.glyphs) do
+		if glyph.unicode == unicode then return glyph end
+	end
+end
+
 
 
 -- RETURN

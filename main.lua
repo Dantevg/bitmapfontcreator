@@ -142,5 +142,5 @@ end
 function love.resize()
 	package.loaded.ui = nil -- "unload" ui
 	gui = require "ui" -- reload ui
-	updatePreviews()
+	updatePreviews(true)
 end

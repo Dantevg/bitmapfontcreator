@@ -129,8 +129,8 @@ end
 y = y+30
 
 local glyphPreview = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage() )
-local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(2) )
-local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImageScaled(4) )
+local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage(2) )
+local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage(4) )
 
 
 
@@ -172,6 +172,11 @@ for i, glyph in ipairs(selectedLayer.glyphs) do
 		updatePreviews()
 	end
 	
+	-- Make sure selected glyph is selected visually, at load
+	if glyph == selectedGlyph then
+		glyphButton:click()
+	end
+	
 	local glyphCodepoint = gui:text( string.format("0x%X",glyph.unicode), {0, (i-1)*50+35, 50, 50}, glyphsList )
 	glyphCodepoint:setfont(10)
 	
@@ -180,21 +185,25 @@ for i, glyph in ipairs(selectedLayer.glyphs) do
 	glyphImages[glyph] = glyphImage
 end
 
-glyphButtons[1]:click() -- Make sure first glyph is selected visually
-
-function updatePreviews()
+function updatePreviews(all)
 	glyphPreview:setimage( selectedGlyph:getImage() )
-	glyphPreview2x:setimage( selectedGlyph:getImageScaled(2) )
+	glyphPreview2x:setimage( selectedGlyph:getImage(2) )
 	glyphPreview2x.pos.x = 20 + selectedGlyph.width
-	glyphPreview4x:setimage( selectedGlyph:getImageScaled(4) )
+	glyphPreview4x:setimage( selectedGlyph:getImage(4) )
 	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
 	
 	local maxScale = math.huge
 	for _, glyph in ipairs(selectedLayer.glyphs) do
 		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
 	end
-	
-	glyphImages[selectedGlyph]:setimage( selectedGlyph:getImageScaled(math.floor(maxScale)) )
+	all = true
+	if all then
+		for glyph, image in pairs(glyphImages) do
+			image:setimage( glyph:getImage(math.floor(maxScale)) )
+		end
+	else
+		glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+	end
 end
 
 

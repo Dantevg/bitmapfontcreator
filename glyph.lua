@@ -22,7 +22,7 @@ function glyph.new(options)
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
 		imageData = imageData,
-		image = love.graphics.newImage(imageData),
+		images = {},
 	}, {__index = glyph} )
 end
 
@@ -56,7 +56,7 @@ function glyph:setPixel( x, y, value )
 	
 	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	
-	self.image = nil -- To regenerate the image for drawing
+	self.images = {} -- To regenerate the image for drawing
 end
 
 -- Save glyph as png to proper location
@@ -64,21 +64,21 @@ function glyph:saveImage(path)
 	self.imageData:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
 end
 
--- Updates the image if necessary, and returns it
-function glyph:getImage()
-	if not self.image then
-		self.image = love.graphics.newImage(self.imageData)
+-- Updates the (possibly scaled up) image if necessary, and returns it
+function glyph:getImage(scale)
+	scale = scale or 1
+	
+	if not self.images[scale] and scale == 1 then
+		self.images[scale] = love.graphics.newImage(self.imageData)
+	elseif not self.images[scale] then
+		local canvas = love.graphics.newCanvas( self.imageData:getWidth()*scale, self.imageData:getHeight()*scale )
+		canvas:renderTo(function()
+			love.graphics.draw( self:getImage(), 0, 0, 0, scale, scale )
+		end)
+		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	end
-	return self.image
-end
-
--- Returns a scaled up version of the glyph image
-function glyph:getImageScaled(scale)
-	local canvas = love.graphics.newCanvas( self.imageData:getWidth()*scale, self.imageData:getHeight()*scale )
-	canvas:renderTo(function()
-		love.graphics.draw( self:getImage(), 0, 0, 0, scale, scale )
-	end)
-	return love.graphics.newImage( canvas:newImageData() )
+	
+	return self.images[scale]
 end
 
 -- Resizes the glyph without losing the contents
@@ -90,7 +90,7 @@ function glyph:resize( width, height )
 		love.graphics.draw( self:getImage() )
 	end)
 	self.imageData = canvas:newImageData()
-	self.image = nil
+	self.images = {}
 end
 
 

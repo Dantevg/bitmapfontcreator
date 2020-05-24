@@ -26,16 +26,18 @@ function font.new(options)
 		},
 	}
 	
-	-- Pre-fill glyphs array with empty glyphs
-	for i = 32, 126 do
+	local function addGlyph(code)
 		table.insert( fnt.layers[1].glyphs, glyph{
-			char = string.char(i),
-			unicode = i,
+			char = string.char(code),
+			unicode = code,
 			width = 5,                -- Default empty width
 			height = fnt.height or 7, -- Default empty height
 			advance = 6,              -- Default empty advance
 		} )
 	end
+	
+	-- Pre-fill glyphs array with empty glyphs
+	for i = 32, 126 do addGlyph(i) end
 	
 	return setmetatable( fnt, {__index = font} )
 end

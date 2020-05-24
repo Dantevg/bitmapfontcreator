@@ -5,6 +5,7 @@
 	
 ]]--
 
+local utf8 = require "utf8"
 local ufo = require "lib/ufo"
 local xml = require "lib/xml2lua"
 local glyph = require "glyph"
@@ -28,7 +29,7 @@ function font.new(options)
 	
 	local function addGlyph(code)
 		table.insert( fnt.layers[1].glyphs, glyph{
-			char = string.char(code),
+			char = utf8.char(code),
 			unicode = code,
 			width = 5,                -- Default empty width
 			height = fnt.height or 7, -- Default empty height
@@ -37,7 +38,8 @@ function font.new(options)
 	end
 	
 	-- Pre-fill glyphs array with empty glyphs
-	for i = 32, 126 do addGlyph(i) end
+	for i = 32, 126 do addGlyph(i) end  -- ISO-8859-1, ASCII
+	for i = 161, 255 do addGlyph(i) end -- ISO-8859-1
 	
 	return setmetatable( fnt, {__index = font} )
 end

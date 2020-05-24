@@ -9,6 +9,8 @@
 	
 ]]--
 
+local utf8 = require "utf8"
+
 local aglfn = {}
 
 aglfn.codepoints = {}
@@ -29,7 +31,7 @@ end
 function aglfn.getName(codepointOrChar)
 	local codepoint = codepointOrChar
 	if type(codepointOrChar) == "string" then
-		codepoint = string.byte(codepointOrChar)
+		codepoint = utf8.codepoint(codepointOrChar)
 	end
 	
 	return aglfn.names[codepoint]
@@ -41,7 +43,7 @@ function aglfn.getCodepoint(nameOrChar)
 	elseif #nameOrChar > 1 then
 		error("Invalid char name: "..nameOrChar)
 	else
-		return string.byte(nameOrChar)
+		return utf8.codepoint(nameOrChar)
 	end
 end
 
@@ -51,7 +53,7 @@ function aglfn.getChar(codepointOrName)
 		codepoint = aglfn.codepoints[codepointOrName]
 	end
 	
-	return string.char(codepoint)
+	return utf8.char(codepoint)
 end
 
 return aglfn

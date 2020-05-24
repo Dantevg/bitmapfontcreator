@@ -144,11 +144,11 @@ glyphsList:setfont(24)
 local glyphButtons = {}
 local glyphImages = {}
 
-for i = 32, 126 do
-	local glyphButton = gui:button( string.char(i), {0, (i-32)*50, 50, 50}, glyphsList )
+for i, glyph in ipairs(selectedLayer.glyphs) do
+	local glyphButton = gui:button(glyph.char, {0, (i-1)*50, 50, 50}, glyphsList )
 	glyphButton.click = function(self)
 		if not fnt then return end
-		switchGlyph(self.label)
+		selectedGlyph = glyph
 		
 		-- Reset colours of other elements
 		for _, btn in ipairs(glyphButtons) do
@@ -170,9 +170,9 @@ for i = 32, 126 do
 		end
 		updatePreviews()
 	end
-	local glyphImage = gui:image( nil, {60, (i-32)*50+5, 50, 50}, glyphsList )
+	local glyphImage = gui:image( nil, {60, (i-1)*50+5, 50, 50}, glyphsList )
 	table.insert( glyphButtons, glyphButton )
-	glyphImages[ string.char(i) ] = glyphImage
+	glyphImages[glyph] = glyphImage
 end
 
 glyphButtons[1]:click() -- Make sure first glyph is selected visually
@@ -189,7 +189,7 @@ function updatePreviews()
 		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
 	end
 	
-	glyphImages[selectedGlyph.char]:setimage( selectedGlyph:getImageScaled(math.floor(maxScale)) )
+	glyphImages[selectedGlyph]:setimage( selectedGlyph:getImageScaled(math.floor(maxScale)) )
 end
 
 

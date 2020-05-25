@@ -11,6 +11,7 @@
 	- GUI lib: https://notabug.org/pgimeno/Gspot/wiki
 	- UFO compiler: https://github.com/googlefonts/fontmake
 	- Python in Lua: https://labix.org/lunatic-python
+	- Unicode reference: https://compart.com/en/unicode/
 	
 	- Example ufo font: https://github.com/adobe-fonts/source-sans-pro/tree/master/Roman/Instances/Regular/font.ufo
 	

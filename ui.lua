@@ -197,7 +197,7 @@ function updatePreviews(all)
 	for _, glyph in ipairs(selectedLayer.glyphs) do
 		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
 	end
-	all = true
+	
 	if all then
 		for glyph, image in pairs(glyphImages) do
 			image:setimage( glyph:getImage(math.floor(maxScale)) )

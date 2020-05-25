@@ -149,6 +149,7 @@ for i, glyph in ipairs(selectedLayer.glyphs) do
 	local glyphButton = gui:button(glyph.char, {0, (i-1)*50, 50, 50}, glyphsList )
 	glyphButton.click = function(self)
 		if not fnt then return end
+		print("Selected glyph "..glyph.name)
 		selectedGlyph = glyph
 		
 		-- Reset colours of other elements

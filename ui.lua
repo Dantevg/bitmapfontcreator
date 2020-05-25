@@ -38,12 +38,12 @@ end
 
 compileFontButton.click = function(self)
 	print("Compile font")
-	local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
-	local inputPath = love.filesystem.getSaveDirectory().."/"..fnt.family..".ufo"
-	local outputPath = love.filesystem.getSaveDirectory().."/"..fnt.family..".ttf"
-	local command = "fontmake -u "..inputPath.." --output-path "..outputPath
-	print("Running "..command)
+	-- local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
+	local path = love.filesystem.getSaveDirectory().."/"..fnt.family
+	local command = "fontmake -u "..path..".ufo --output-path "..path..".ttf"
+	print("Executing "..command..":\n")
 	os.execute(command)
+	print("\nDone.")
 end
 
 
@@ -197,7 +197,7 @@ function updatePreviews(all)
 	for _, glyph in ipairs(selectedLayer.glyphs) do
 		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
 	end
-	
+
 	if all then
 		for glyph, image in pairs(glyphImages) do
 			image:setimage( glyph:getImage(math.floor(maxScale)) )

@@ -263,7 +263,7 @@ function font:save(path)
 end
 
 function font:getGlyph( layer, unicode )
-	if type(input) == "string" then
+	if type(unicode) == "string" then
 		unicode = aglfn.getCodepoint(unicode)
 	end
 	

@@ -9,6 +9,7 @@ local utf8 = require "utf8"
 local aglfn = require "lib/aglfn"
 local ufo = require "lib/ufo"
 local xml = require "lib/xml2lua"
+local xmlread = require "lib/xmlread"
 local glyph = require "glyph"
 
 local font = {}
@@ -61,16 +62,56 @@ end
 font.inputfiles = {}
 
 function font.inputfiles.metainfo(input)
-	local xmlInput = require "lib/xmlhandler/dom"
-	xml.parser(xmlInput):parse(input)
+	local xml = xmlread(input)
 	local metainfo = {}
 	
-	local plist = xmlInput.root._children
-	for i = 1, #plist do
-		
+	local dict = xml[2][1]
+	for i = 1, #dict, 2 do
+		metainfo[ dict[i][1] ] = dict[i+1][1]
 	end
 	
+	table.insert( metainfo, xml.input.dict(dict) )
+	
 	return metainfo
+end
+
+function font.inputfiles.fontinfo(input)
+	local xml = xmlread(input)
+	local fontinfo = {}
+	
+	local dict = xml[2][1]
+	for i = 1, #dict, 2 do
+		fontinfo[ dict[i][1] ] = dict[i+1][1]
+	end
+	
+	return fontinfo
+end
+
+function font.inputfiles.layercontents(input)
+	local xml = xmlread(input)
+	local layers = {}
+	
+	local array = xml[2][1]
+	for i = 1, #array do
+		table.insert( layers, {
+			name = array[i][1],
+			directory = array[i][2]
+		} )
+	end
+	
+	return layers
+end
+
+function font.inputfiles.glyphs_contents(input)
+	local xml = xmlread(input)
+	local glyphs = {}
+	
+	local dict = xml[2][1]
+	for i = 1, #dict, 2 do
+		glyphs[ dict[i][1] ] = dict[i+1][1]
+	end
+	
+	return glyphs
 end
 
 

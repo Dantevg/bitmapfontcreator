@@ -22,6 +22,7 @@
 ]]--
 
 local xml = require "lib/xml2lua"
+local xmlread = require "lib/xmlread"
 local font = require "font"
 local gui
 
@@ -39,6 +40,9 @@ function love.load()
 	-- Select default characters
 	selectedLayer = fnt.layers[1]
 	selectedGlyph = selectedLayer.glyphs[1]
+	
+	s = fnt:generateXML("metainfo", selectedLayer)
+	t = xmlread.parse(s)
 	
 	-- Print a welcome message to the terminal
 	print("Welcome to BitmapFontCreator")

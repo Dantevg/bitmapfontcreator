@@ -18,6 +18,47 @@ local xml = {}
 xml.input = {}
 
 function xml.input.string(input)
+	return input[1]
+end
+
+function xml.input.integer(input)
+	return tonumber(input[1])
+end
+
+function xml.input.array(input)
+	local array = {}
+	
+	for i = 1, #input do
+		table.insert( array, xml.input( input[i] ) )
+	end
+	
+	return array
+end
+
+function xml.input.dict(input)
+	local dict = {}
+	
+	for i = 1, #input, 2 do
+		dict[ input[i][1] ] = xml.input( input[i+1] )
+	end
+	
+	return dict
+end
+
+function xml.input.plist(input)
+	local plist = {}
+	
+	table.insert( plist, xml.input( input._children[1] ) )
+	
+	return plist
+end
+
+setmetatable( xml.input, {__call = function( _, input )
+	if not xml.input[input._name] then error("Incompatible xml element: "..input._name) end
+	return xml.input[input._name](input)
+end} )
+
+--[[ function xml.input.string(input)
 	return input._children[1]._text
 end
 
@@ -56,7 +97,7 @@ end
 setmetatable( xml.input, {__call = function( _, input )
 	if not xml.input[input._name] then error("Incompatible xml element: "..input._name) end
 	return xml.input[input._name](input)
-end} )
+end} ) ]]
 
 
 

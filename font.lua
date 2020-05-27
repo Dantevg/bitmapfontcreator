@@ -48,11 +48,23 @@ function font.new(options)
 end
 
 function font.load(path)
-	local font = {}
+	if not path then error("Expected path") end
+	local fnt = {}
 	
-	return setmetatable( {
-		
-	}, {__index = font} )
+	love.filesystem.mount( path, ".temp" )
+	
+	font.inputfiles.metainfo( fnt, love.filesystem.read(".temp/metainfo.plist") )
+	font.inputfiles.fontinfo( fnt, love.filesystem.read(".temp/fontinfo.plist") )
+	font.inputfiles.layercontents( fnt, love.filesystem.read(".temp/layercontents.plist") )
+	
+	for _, layer in ipairs(fnt.layers) do
+		local glyphs = font.inputfiles.glyphs_contents( fnt, love.filesystem.read(".temp/"..layer.directory.."/contents.plist") )
+		for name, path in pairs(glyphs) do
+			table.insert( layer.glyphs, font.inputfiles.glif( fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name ) )
+		end
+	end
+	
+	return setmetatable( fnt, {__index = font} )
 end
 
 
@@ -61,57 +73,67 @@ end
 
 font.inputfiles = {}
 
-function font.inputfiles.metainfo(input)
-	local xml = xmlread(input)
-	local metainfo = {}
-	
-	local dict = xml[2][1]
-	for i = 1, #dict, 2 do
-		metainfo[ dict[i][1] ] = dict[i+1][1]
-	end
-	
-	table.insert( metainfo, xml.input.dict(dict) )
-	
-	return metainfo
+function font.inputfiles.metainfo( fnt, input )
+	local metainfo = xml.input.dict( xmlread(input)[2][1] )
+	fnt.author = metainfo.creator
 end
 
-function font.inputfiles.fontinfo(input)
-	local xml = xmlread(input)
-	local fontinfo = {}
+function font.inputfiles.fontinfo( fnt, input )
+	local fontinfo = xml.input.dict( xmlread(input)[2][1] )
 	
-	local dict = xml[2][1]
-	for i = 1, #dict, 2 do
-		fontinfo[ dict[i][1] ] = dict[i+1][1]
-	end
+	fnt.family = fontinfo.familyName
+	fnt.style = fontinfo.styleName
+	fnt.version = fontinfo.versionMajor.."."..fontinfo.versionMinor
+	fnt.year = fontinfo.year
 	
-	return fontinfo
+	fnt.copyright = fontinfo.copyright
+	fnt.trademark = fontinfo.trademark
+	
+	fnt.unitsPerEm = fontinfo.unitsPerEm
+	fnt.descender = fontinfo.descender
+	fnt.xHeight = fontinfo.xHeight
+	fnt.capHeight = fontinfo.capHeight
+	fnt.ascender = fontinfo.ascender
+	
+	fnt.note = fontinfo.note
 end
 
-function font.inputfiles.layercontents(input)
-	local xml = xmlread(input)
-	local layers = {}
+function font.inputfiles.layercontents( fnt, input )
+	local layercontents = xmlread(input)[2][1]
+	fnt.layers = {}
 	
-	local array = xml[2][1]
-	for i = 1, #array do
-		table.insert( layers, {
-			name = array[i][1],
-			directory = array[i][2]
+	for i = 1, #layercontents do
+		table.insert( fnt.layers, {
+			name = layercontents[i][1],
+			directory = layercontents[i][2],
+			glyphs = {},
 		} )
 	end
-	
-	return layers
 end
 
-function font.inputfiles.glyphs_contents(input)
-	local xml = xmlread(input)
-	local glyphs = {}
+function font.inputfiles.glyphs_contents( fnt, input )
+	local glyphs_contents = xml.input.dict( xmlread(input)[2][1] )
 	
-	local dict = xml[2][1]
-	for i = 1, #dict, 2 do
-		glyphs[ dict[i][1] ] = dict[i+1][1]
+	return glyphs_contents
+end
+
+function font.inputfiles.glif( fnt, input, name )
+	local glif = xmlread(input)
+	local options = {name = name}
+	
+	for i = 1, #glif do
+		if glif[i].name == "unicode" then
+			glyph.unicode = glif[i].args.hex
+		elseif glif[i].name == "advance" then
+			glyph.advance = glif[i].args.width
+		elseif glif[i].name == "image" then
+			glyph.imageData = love.graphics.newImage( ".temp/images/"..glif[i].args.fileName )
+		elseif glif[i].name == "outline" then
+			-- TODO: read outline to image
+		end
 	end
 	
-	return glyphs
+	return glyph.new(options)
 end
 
 

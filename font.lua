@@ -14,6 +14,8 @@ local glyph = require "glyph"
 
 local font = {}
 
+font.scale = 100
+
 function font.new(options)
 	if not options then error("Expected options") end
 	
@@ -23,7 +25,6 @@ function font.new(options)
 		height = options.height,
 		style = options.style or "regular",
 		version = options.version or "1.0",
-		scale = 100,
 		layers = {
 			{name = "public.default", directory = "glyphs", glyphs = {}}
 		},
@@ -130,7 +131,7 @@ function font.inputfiles.glif( fnt, input, name )
 		if glif[i].name == "unicode" then
 			options.unicode = tonumber( glif[i].args.hex, 16 )
 		elseif glif[i].name == "advance" then
-			options.advance = tonumber( glif[i].args.width )
+			options.advance = tonumber( glif[i].args.width ) / font.scale
 		elseif glif[i].name == "image" then
 			options.imageData = love.image.newImageData( ".temp/images/"..glif[i].args.fileName )
 		elseif glif[i].name == "outline" then
@@ -273,7 +274,7 @@ function font.outputfiles.glif( fnt, layer, glyph )
 		},
 		{
 			name = "advance",
-			attr = { width = glyph.advance*fnt.scale }
+			attr = { width = glyph.advance*font.scale }
 		},
 		{
 			name = "image",
@@ -281,7 +282,7 @@ function font.outputfiles.glif( fnt, layer, glyph )
 		},
 		{
 			name = "outline",
-			unpack( glyph:getContours(fnt.scale) )
+			unpack( glyph:getContours(font.scale) )
 		},
 	}
 end

@@ -60,6 +60,6 @@ end
 
 return setmetatable( xmlread, {
 	__call = function(_,...)
-		xmlread.parse(...)
+		return xmlread.parse(...)
 	end
 } )

@@ -59,47 +59,6 @@ setmetatable( xml.input, {__call = function( _, input )
 	return xml.input[input.name](input)
 end} )
 
---[[ function xml.input.string(input)
-	return input._children[1]._text
-end
-
-function xml.input.integer(input)
-	return input._children[1]._text
-end
-
-function xml.input.array(input)
-	local array = {}
-	
-	for i = 1, #input._children do
-		table.insert( array, xml.input( input._children[i] ) )
-	end
-	
-	return array
-end
-
-function xml.input.dict(input)
-	local dict = {}
-	
-	for i = 1, #input._children, 2 do
-		dict[ input._children[i]._children[1]._text ] = xml.input( input._children[i+1] )
-	end
-	
-	return dict
-end
-
-function xml.input.plist(input)
-	local plist = {}
-	
-	table.insert( plist, xml.input( input._children[1] ) )
-	
-	return plist
-end
-
-setmetatable( xml.input, {__call = function( _, input )
-	if not xml.input[input._name] then error("Incompatible xml element: "..input._name) end
-	return xml.input[input._name](input)
-end} ) ]]
-
 
 
 -- LUA TO XML
@@ -131,7 +90,7 @@ function xml.output.toString( data, level )
 	else
 		for _, v in ipairs(data) do
 			if type(v) == "table" then
-				s = s.."\n"..string.rep( "    ", level+1 )..ufo.toXML( v, level+1 )
+				s = s.."\n"..string.rep( "    ", level+1 )..xml.output.toString( v, level+1 )
 			else
 				s = s.."\n"..string.rep( "    ", level+1 )..tostring( v )
 			end

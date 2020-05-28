@@ -21,8 +21,6 @@
 	
 ]]--
 
-local xml = require "lib/xml2lua"
-local xmlread = require "lib/xmlread"
 local font = require "font"
 local gui
 

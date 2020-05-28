@@ -5,7 +5,7 @@
 	
 	Converts:
 		- lua tables to XML
-		- XML output from xml2lua to lua tables
+		- XML output from xmlread to lua tables
 	
 ]]--
 

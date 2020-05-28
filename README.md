@@ -8,5 +8,4 @@ be finished early June.
 See [LICENSE](LICENSE).
 
 This project uses the following libraries:
-- [Xml2Lua](https://github.com/manoelcampos/Xml2Lua) ([MIT](https://github.com/manoelcampos/xml2lua/blob/master/LICENSE))
 - [Gspöt](https://notabug.org/pgimeno/Gspot) (Zlib/libpng)

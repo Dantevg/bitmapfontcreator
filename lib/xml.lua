@@ -29,7 +29,7 @@ function xml.input.array(input)
 	local array = {}
 	
 	for i = 1, #input do
-		table.insert( array, input[i] )
+		table.insert( array, xml.input(input[i]) )
 	end
 	
 	return array
@@ -39,7 +39,7 @@ function xml.input.dict(input)
 	local dict = {}
 	
 	for i = 1, #input, 2 do
-		dict[ input[i][1] ] = input[i+1]
+		dict[ input[i][1] ] = xml.input(input[i+1])
 	end
 	
 	return dict
@@ -48,12 +48,13 @@ end
 function xml.input.plist(input)
 	local plist = {}
 	
-	table.insert( plist, input[1] )
+	table.insert( plist, xml.input(input[1]) )
 	
 	return plist
 end
 
 setmetatable( xml.input, {__call = function( _, input )
+	if not input then return end
 	if not xml.input[input.name] then error("Incompatible xml element: "..input.name) end
 	return xml.input[input.name](input)
 end} )

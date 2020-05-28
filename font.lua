@@ -8,7 +8,7 @@
 local utf8 = require "utf8"
 local aglfn = require "lib/aglfn"
 local ufo = require "lib/ufo"
-local xml = require "lib/xml2lua"
+local xml = require "lib/xml"
 local xmlread = require "lib/xmlread"
 local glyph = require "glyph"
 
@@ -62,7 +62,12 @@ function font.load(path)
 		for name, path in pairs(glyphs) do
 			table.insert( layer.glyphs, font.inputfiles.glif( fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name ) )
 		end
+		table.sort( layer.glyphs, function(a,b)
+			return a.unicode < b.unicode
+		end )
 	end
+	
+	love.filesystem.unmount(".temp")
 	
 	return setmetatable( fnt, {__index = font} )
 end
@@ -104,8 +109,8 @@ function font.inputfiles.layercontents( fnt, input )
 	
 	for i = 1, #layercontents do
 		table.insert( fnt.layers, {
-			name = layercontents[i][1],
-			directory = layercontents[i][2],
+			name = xml.input(layercontents[i][1]),
+			directory = xml.input(layercontents[i][2]),
 			glyphs = {},
 		} )
 	end
@@ -118,16 +123,16 @@ function font.inputfiles.glyphs_contents( fnt, input )
 end
 
 function font.inputfiles.glif( fnt, input, name )
-	local glif = xmlread(input)
+	local glif = xmlread(input)[2]
 	local options = {name = name}
 	
 	for i = 1, #glif do
 		if glif[i].name == "unicode" then
-			glyph.unicode = glif[i].args.hex
+			options.unicode = tonumber( glif[i].args.hex, 16 )
 		elseif glif[i].name == "advance" then
-			glyph.advance = glif[i].args.width
+			options.advance = tonumber( glif[i].args.width )
 		elseif glif[i].name == "image" then
-			glyph.imageData = love.graphics.newImage( ".temp/images/"..glif[i].args.fileName )
+			options.imageData = love.image.newImageData( ".temp/images/"..glif[i].args.fileName )
 		elseif glif[i].name == "outline" then
 			-- TODO: read outline to image
 		end

@@ -41,9 +41,6 @@ function love.load()
 	selectedLayer = fnt.layers[1]
 	selectedGlyph = selectedLayer.glyphs[1]
 	
-	s = fnt:generateXML("metainfo", selectedLayer)
-	t = xmlread.parse(s)
-	
 	-- Print a welcome message to the terminal
 	print("Welcome to BitmapFontCreator")
 	print("============================")
@@ -145,6 +142,17 @@ function love.mousemoved( x, y )
 end
 
 function love.resize()
+	package.loaded.ui = nil -- "unload" ui
+	gui = require "ui" -- reload ui
+	updatePreviews(true)
+end
+
+function love.directorydropped(path)
+	fnt = font.load(path)
+	
+	selectedLayer = fnt.layers[1]
+	selectedGlyph = selectedLayer.glyphs[1]
+	
 	package.loaded.ui = nil -- "unload" ui
 	gui = require "ui" -- reload ui
 	updatePreviews(true)

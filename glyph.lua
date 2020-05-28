@@ -11,6 +11,13 @@ local glyph = {}
 
 function glyph.new(options)
 	if not options then error("Expected options") end
+	if not options.imageData and (not options.width or not options.height) then
+		error("Expected imageData or width, height")
+	end
+	if not options.unicode and not options.name and not options.char then
+		error("Expected unicode or name or char")
+	end
+	
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
 	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
 	

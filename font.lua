@@ -156,13 +156,13 @@ function font.outputfiles.metainfo(fnt)
 		return false, "Author name must be present and not empty"
 	end
 	
-	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist{
-			ufo.dict{
+	return ufo.plistHeader.."\n"..xml.output.toString(
+		xml.output.plist({
+			xml.output.dict{
 				creator = fnt.author,
 				formatVersion = 3,
 			}
-		}
+		}, {version = "1.0"})
 	)
 end
 
@@ -189,10 +189,10 @@ function font.outputfiles.fontinfo(fnt)
 	
 	info.note = fnt.note
 	
-	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist{
-			ufo.dict(info)
-		}
+	return ufo.plistHeader.."\n"..xml.output.toString(
+		xml.output.plist({
+			xml.output.dict(info)
+		}, {version = "1.0"})
 	)
 end
 
@@ -219,8 +219,9 @@ function font.outputfiles.layercontents(fnt)
 			return false, "Layer name 'public.default' may only be used for directory 'glyphs'"
 		end
 		if v.directory == "glyphs" then hasGlyphsDir = true end
-		table.insert( layers, ufo.array(
+		table.insert( layers, xml.output.array(
 			{v.name, v.directory},
+			nil,
 			"string"
 		) )
 	end
@@ -229,9 +230,10 @@ function font.outputfiles.layercontents(fnt)
 		return false, "Default 'glyhps' dir must be present"
 	end
 	
-	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist(
-			ufo.array(layers, "array")
+	return ufo.plistHeader.."\n"..xml.output.toString(
+		xml.output.plist(
+			xml.output.array(layers, nil, "array"),
+			{version = "1.0"}
 		)
 	)
 end
@@ -249,10 +251,10 @@ function font.outputfiles.glyphs_contents( fnt, layer )
 		glyphs[v.name] = ufo.convertToFilename(v.name)..".glif"
 	end
 	
-	return ufo.plistHeader.."\n"..ufo.toXML(
-		ufo.plist{
-			ufo.dict(glyphs)
-		}
+	return ufo.plistHeader.."\n"..xml.output.toString(
+		xml.output.plist({
+			xml.output.dict(glyphs)
+		}, {version = "1.0"})
 	)
 end
 
@@ -265,7 +267,7 @@ function font.outputfiles.glif( fnt, layer, glyph )
 		return false, "Glyph unicode must be present"
 	end
 	
-	return ufo.xmlHeader.."\n"..ufo.toXML{
+	return ufo.xmlHeader.."\n"..xml.output.toString{
 		name = "glyph",
 		attr = {name = glyph.name, format = 2},
 		{

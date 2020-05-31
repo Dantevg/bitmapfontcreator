@@ -59,6 +59,7 @@ end
 function glyph:setPixel( x, y, value )
 	x, y = math.floor(x), math.floor(y)
 	if not value and (x >= self.width or y >= self.height) then return end
+	if x < 0 or y < 0 then return end
 	
 	self:autoresize( x, y ) -- Auto resize if pixel was out of range
 	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
@@ -104,6 +105,7 @@ function glyph:resize( width, height )
 	self.images = {}
 end
 
+-- Resize glyph to fit contents
 function glyph:autoresize( x, y )
 	local maxX, maxY = x or 0, y or 0
 	self.imageData:mapPixel(function( x, y, v, ... )

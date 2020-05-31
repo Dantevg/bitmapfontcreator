@@ -141,6 +141,16 @@ function toGlyphCoords( x, y )
 	return x, y, (insideX and insideY)
 end
 
+function setCursor( x, y, inside )
+	if love.mouse.isDown(3) then
+		love.mouse.setCursor( love.mouse.getSystemCursor("sizeall") )
+	elseif draggingAdvanceLine or (inside and math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
+		love.mouse.setCursor( love.mouse.getSystemCursor("sizewe") )
+	else
+		love.mouse.setCursor( love.mouse.getSystemCursor("arrow") )
+	end
+end
+
 -- Forward love2d events to Gspot GUI
 function love.keypressed(key)
 	gui:keypress(key)
@@ -154,11 +164,12 @@ function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
 	local _, _, inside = toCanvasCoords( x, y )
+	setCursor( x, y, inside )
 	
-	if inside then -- Click within canvas boundaries
+	if inside and btn == 1 or btn == 2 then -- Click within canvas boundaries
 		if math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10 then
 			draggingAdvanceLine = true
-		elseif btn == 1 or btn == 2 then -- Draw and update previews
+		else -- Draw and update previews
 			x, y = toGlyphCoords( x, y )
 			selectedGlyph:setPixel( x, y, btn==1 )
 			updatePreviews()
@@ -170,6 +181,7 @@ function love.mousereleased( x, y, btn )
 	gui:mouserelease( x, y, btn )
 	
 	draggingAdvanceLine = false
+	setCursor( x, y, select( 3, toCanvasCoords(x,y) ) )
 end
 
 function love.wheelmoved( x, y )
@@ -185,13 +197,7 @@ end
 
 function love.mousemoved( x, y, dx, dy )
 	local _, _, inside = toCanvasCoords( x, y )
-	
-	if draggingAdvanceLine or (inside and math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
-		love.mouse.setCursor( love.mouse.getSystemCursor("sizewe") )
-	else
-		love.mouse.setCursor( love.mouse.getSystemCursor("arrow") )
-	end
-	
+	setCursor( x, y, inside )
 	x, y = toGlyphCoords( x, y )
 	
 	if draggingAdvanceLine then

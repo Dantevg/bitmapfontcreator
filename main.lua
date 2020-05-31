@@ -27,6 +27,7 @@ local gui
 -- local fnt, selectedGlyph, selectedLayer
 glyphListWidth = 100
 local scale, scaleRound = 50, 50
+
 local canvasPos = {}
 canvasPos.x = function() return glyphListWidth+16 end
 canvasPos.y = function() return 0 end
@@ -34,6 +35,14 @@ canvasPos.w = function() return love.graphics.getWidth() - canvasPos.x() - 200 e
 canvasPos.h = function() return love.graphics.getHeight() - 50 end
 canvasPos.x2 = function() return canvasPos.x() + canvasPos.w() end
 canvasPos.y2 = function() return canvasPos.y() + canvasPos.h() end
+
+local glyphPos = { _x=0, _y=0 }
+glyphPos.x = function() return canvasPos.x() + glyphPos._x end
+glyphPos.y = function() return canvasPos.y() + glyphPos._y end
+glyphPos.w = function() return selectedGlyph.width * scaleRound end
+glyphPos.h = function() return selectedGlyph.height * scaleRound end
+glyphPos.x2 = function() return glyphPos.x() + glyphPos.w() end
+glyphPos.y2 = function() return glyphPos.y() + glyphPos.h() end
 
 local draggingAdvanceLine = false
 
@@ -74,13 +83,13 @@ function love.draw()
 	
 	-- Draw glyph background
 	love.graphics.setColor( 0, 0, 0 )
-	love.graphics.rectangle( "fill", glyphListWidth+16, 0,
+	love.graphics.rectangle( "fill", glyphPos.x(), glyphPos.y(),
 		selectedGlyph.width*scaleRound,
 		selectedGlyph.height*scaleRound )
 	
 	-- Draw glyph
 	love.graphics.setColor( 1, 1, 1 )
-	love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, scaleRound, scaleRound )
+	love.graphics.draw( selectedGlyph:getImage(), glyphPos.x(), glyphPos.y(), 0, scaleRound, scaleRound )
 	
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then
@@ -95,13 +104,13 @@ function love.draw()
 	
 	-- Draw glyph advance line
 	love.graphics.setColor( 0, 0.3, 0.5 )
-	love.graphics.line( canvasPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y(),
-		canvasPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y2() )
+	love.graphics.line( glyphPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y(),
+		glyphPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y2() )
 	
 	-- Draw font preview
 	love.graphics.setColor( 1, 1, 1 )
 	local sentence = "The quick brown fox jumps over the lazy dog."
-	local x = glyphListWidth+21
+	local x = canvasPos.x()+5
 	for i = 1, #sentence do
 		local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
 		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-70, 0, 2, 2 )
@@ -120,8 +129,8 @@ end
 
 -- Convert screen coordinates to glyph image coordinates
 function toGlyphCoords( x, y )
-	x = (x-canvasPos.x()) / scaleRound
-	y = (y-canvasPos.y()) / scaleRound
+	x = (x-glyphPos.x()) / scaleRound
+	y = (y-glyphPos.y()) / scaleRound
 	local insideX = (x >= 0 and x < selectedGlyph.width)
 	local insideY = (y >= 0 and y < selectedGlyph.height)
 	return x, y, (insideX and insideY)
@@ -142,9 +151,9 @@ function love.mousepressed( x, y, btn )
 	local _, _, inside = toCanvasCoords( x, y )
 	
 	if inside then -- Click within canvas boundaries
-		if math.abs( canvasPos.x() + selectedGlyph.advance*scaleRound - x ) < 10 then
+		if math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10 then
 			draggingAdvanceLine = true
-		else -- Draw and update previews
+		elseif btn == 1 or btn == 2 then -- Draw and update previews
 			x, y = toGlyphCoords( x, y )
 			selectedGlyph:setPixel( x, y, btn==1 )
 			updatePreviews()
@@ -169,10 +178,10 @@ function love.wheelmoved( x, y )
 	end
 end
 
-function love.mousemoved( x, y )
+function love.mousemoved( x, y, dx, dy )
 	local _, _, inside = toCanvasCoords( x, y )
 	
-	if draggingAdvanceLine or (inside and math.abs( canvasPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
+	if draggingAdvanceLine or (inside and math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
 		love.mouse.setCursor( love.mouse.getSystemCursor("sizewe") )
 	else
 		love.mouse.setCursor( love.mouse.getSystemCursor("arrow") )
@@ -182,13 +191,16 @@ function love.mousemoved( x, y )
 	
 	if draggingAdvanceLine then
 		selectedGlyph.advance = round(x)
-	else -- Drag draw if mouse is within canvas boundaries
-		if inside and love.mouse.isDown(1) and not draggingAdvanceLine then
+	elseif inside then -- Drag draw if mouse is within canvas boundaries
+		if love.mouse.isDown(1) then
 			selectedGlyph:setPixel( x, y, true )
 			updatePreviews()
-		elseif inside and love.mouse.isDown(2) and not draggingAdvanceLine then
+		elseif love.mouse.isDown(2) then
 			selectedGlyph:setPixel( x, y, false )
 			updatePreviews()
+		elseif love.mouse.isDown(3) then
+			glyphPos._x = glyphPos._x + dx
+			glyphPos._y = glyphPos._y + dy
 		end
 	end
 end

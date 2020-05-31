@@ -27,6 +27,13 @@ local gui
 -- local fnt, selectedGlyph, selectedLayer
 glyphListWidth = 100
 local scale = 50
+local canvasPos = {}
+canvasPos.x = function() return glyphListWidth+16 end
+canvasPos.y = function() return 0 end
+canvasPos.w = function() return love.graphics.getWidth() - canvasPos.x() - 200 end
+canvasPos.h = function() return love.graphics.getHeight() - 50 end
+canvasPos.x2 = function() return canvasPos.x() + canvasPos.w() end
+canvasPos.y2 = function() return canvasPos.y() + canvasPos.h() end
 
 function love.load()
 	love.graphics.setDefaultFilter( "nearest", "nearest" ) -- Prevent blurry glyph scaling
@@ -59,25 +66,33 @@ end
 function love.draw()
 	love.graphics.clear( 0.1, 0.1, 0.1 )
 	
-	if fnt then
-		-- Draw glyph background
-		love.graphics.setColor( 0, 0, 0 )
-		love.graphics.rectangle( "fill", glyphListWidth+16, 0,
-			selectedGlyph.width*math.floor(scale),
-			selectedGlyph.height*math.floor(scale) )
-		
-		-- Draw glyph
-		love.graphics.setColor( 1, 1, 1 )
-		love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
-		
-		-- Draw font preview
-		local sentence = "The quick brown fox jumps over the lazy dog."
-		local x = glyphListWidth+21
-		for i = 1, #sentence do
-			local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
-			love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-70, 0, 2, 2 )
-			x = x+glyph.advance*2
-		end
+	-- Draw glyph background
+	love.graphics.setColor( 0, 0, 0 )
+	love.graphics.rectangle( "fill", glyphListWidth+16, 0,
+		selectedGlyph.width*math.floor(scale),
+		selectedGlyph.height*math.floor(scale) )
+	
+	-- Draw glyph
+	love.graphics.setColor( 1, 1, 1 )
+	love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
+	
+	-- Draw pixel aligned lines
+	love.graphics.setColor( 0.5, 0.5, 0.5, 0.5 )
+	for x = canvasPos.x()+math.floor(scale), canvasPos.x2(), math.floor(scale) do
+		love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
+	end
+	for y = canvasPos.y()+math.floor(scale), canvasPos.y2(), math.floor(scale) do
+		love.graphics.line( canvasPos.x(), y, canvasPos.x2(), y )
+	end
+	
+	-- Draw font preview
+	love.graphics.setColor( 1, 1, 1 )
+	local sentence = "The quick brown fox jumps over the lazy dog."
+	local x = glyphListWidth+21
+	for i = 1, #sentence do
+		local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
+		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-70, 0, 2, 2 )
+		x = x+glyph.advance*2
 	end
 	
 	gui:draw()

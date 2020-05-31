@@ -36,7 +36,7 @@ canvasPos.h = function() return love.graphics.getHeight() - 50 end
 canvasPos.x2 = function() return canvasPos.x() + canvasPos.w() end
 canvasPos.y2 = function() return canvasPos.y() + canvasPos.h() end
 
-local glyphPos = { _x=0, _y=0 }
+local glyphPos = { _x=scale, _y=canvasPos.h()-scale }
 glyphPos.x = function() return canvasPos.x() + glyphPos._x end
 glyphPos.y = function() return canvasPos.y() + glyphPos._y end
 glyphPos.w = function() return selectedGlyph.width * scaleRound end
@@ -82,14 +82,14 @@ function love.draw()
 	love.graphics.clear( 0.1, 0.1, 0.1 )
 	
 	-- Draw glyph background
-	love.graphics.setColor( 0, 0, 0 )
-	love.graphics.rectangle( "fill", glyphPos.x(), glyphPos.y(),
-		selectedGlyph.width*scaleRound,
-		selectedGlyph.height*scaleRound )
+	-- love.graphics.setColor( 0, 0, 0 )
+	-- love.graphics.rectangle( "fill", glyphPos.x(), glyphPos.y(),
+	-- 	selectedGlyph.width*scaleRound,
+	-- 	selectedGlyph.height*scaleRound )
 	
 	-- Draw glyph
 	love.graphics.setColor( 1, 1, 1 )
-	love.graphics.draw( selectedGlyph:getImage(), glyphPos.x(), glyphPos.y(), 0, scaleRound, scaleRound )
+	love.graphics.draw( selectedGlyph:getImage(), glyphPos.x(), glyphPos.y(), 0, scaleRound, -scaleRound )
 	
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then
@@ -97,13 +97,18 @@ function love.draw()
 		for x = glyphPos.x(), canvasPos.x2(), scaleRound do
 			love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
 		end
-		for y = glyphPos.y(), canvasPos.y2(), scaleRound do
+		for y = glyphPos.y(), canvasPos.y(), -scaleRound do
 			love.graphics.line( canvasPos.x(), y, canvasPos.x2(), y )
 		end
 	end
 	
+	-- Draw glyph baseline and left line
+	love.graphics.setColor( 1, 1, 1 )
+	love.graphics.line( canvasPos.x(), glyphPos.y(), canvasPos.x2(), glyphPos.y() )
+	love.graphics.line( glyphPos.x(), canvasPos.y(), glyphPos.x(), canvasPos.y2() )
+	
 	-- Draw glyph advance line
-	love.graphics.setColor( 0, 0.3, 0.5 )
+	love.graphics.setColor( 0, 0.5, 1, 0.5 )
 	love.graphics.line( glyphPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y(),
 		glyphPos.x()+selectedGlyph.advance*scaleRound, canvasPos.y2() )
 	
@@ -130,7 +135,7 @@ end
 -- Convert screen coordinates to glyph image coordinates
 function toGlyphCoords( x, y )
 	x = (x-glyphPos.x()) / scaleRound
-	y = (y-glyphPos.y()) / scaleRound
+	y = (glyphPos.y()-y) / scaleRound
 	local insideX = (x >= 0 and x < selectedGlyph.width)
 	local insideY = (y >= 0 and y < selectedGlyph.height)
 	return x, y, (insideX and insideY)

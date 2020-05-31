@@ -57,11 +57,9 @@ end
 
 -- Set the pixel at position (x,y) to value
 function glyph:setPixel( x, y, value )
-	if x < 0 or x >= self.width or y < 0 or y >= self.height then
-		error("Coordinates out of range: ("..x..","..y..") does not fit in ("..self.width..","..self.height..")")
-	end
-	
+	self:autoresize( x, y ) -- Auto resize if pixel was out of range
 	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
+	self:autoresize()
 	
 	self.images = {} -- To regenerate the image for drawing
 end
@@ -91,6 +89,9 @@ end
 -- Resizes the glyph without losing the contents
 function glyph:resize( width, height )
 	width, height = width or self.width, height or self.height
+	if width == self.width and height == self.height then return end
+	print("Resized glyph "..self.name.." to "..self.width..", "..self.height)
+	
 	self.width, self.height = width, height
 	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
 	canvas:renderTo(function()
@@ -98,6 +99,17 @@ function glyph:resize( width, height )
 	end)
 	self.imageData = canvas:newImageData()
 	self.images = {}
+end
+
+function glyph:autoresize( x, y )
+	local maxX, maxY = x or 0, y or 0
+	self.imageData:mapPixel(function( x, y, v, ... )
+		if v == 1 then
+			maxX, maxY = math.max( maxX, x ), math.max( maxY, y )
+		end
+		return v, ...
+	end)
+	self:resize( maxX+1, maxY+1 )
 end
 
 

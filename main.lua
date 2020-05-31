@@ -126,7 +126,8 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	local x, y, inside = toGlyphCoords( x, y )
+	local _, _, inside = toCanvasCoords( x, y )
+	x, y = toGlyphCoords( x, y )
 	if inside then
 		-- Clicked within canvas boundaries, draw and update previews
 		selectedGlyph:setPixel( x, y, btn==1 )

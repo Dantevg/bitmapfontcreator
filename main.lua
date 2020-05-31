@@ -77,7 +77,7 @@ function love.draw()
 	love.graphics.draw( selectedGlyph:getImage(), glyphListWidth+16, 0, 0, math.floor(scale), math.floor(scale) )
 	
 	-- Draw pixel aligned lines
-	love.graphics.setColor( 0.5, 0.5, 0.5, 0.5 )
+	love.graphics.setColor( 0.3, 0.3, 0.3, 0.5 )
 	for x = canvasPos.x()+math.floor(scale), canvasPos.x2(), math.floor(scale) do
 		love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
 	end
@@ -100,11 +100,11 @@ end
 
 -- Convert screen coordinates to glyph image / canvas coordinates
 function toCanvasCoords( x, y )
-	x = math.floor((x-glyphListWidth-16)/math.floor(scale))
-	y = math.floor(y/math.floor(scale))
-	if x >= 0 and x < selectedGlyph.width and y < selectedGlyph.height then
-		return x, y
-	end
+	x = math.floor( (x-canvasPos.x()) / math.floor(scale) )
+	y = math.floor( (y-canvasPos.y()) / math.floor(scale) )
+	local insideX = (x >= 0 and x < selectedGlyph.width)
+	local insideY = (y >= 0 and y < selectedGlyph.height)
+	return x, y, (insideX and insideY)
 end
 
 -- Forward love2d events to Gspot GUI
@@ -119,8 +119,8 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	x, y = toCanvasCoords( x, y )
-	if x then
+	local x, y, inside = toCanvasCoords( x, y )
+	if inside then
 		-- Clicked within canvas boundaries, draw and update previews
 		selectedGlyph:setPixel( x, y, btn==1 )
 		updatePreviews()
@@ -135,20 +135,20 @@ function love.wheelmoved( x, y )
 	gui:mousewheel( x, y )
 	
 	-- Zoom if mouse isn't over GUI
-	if love.mouse.getX() > glyphListWidth+16 and love.mouse.getX() < love.graphics.getWidth()-200
-			and love.mouse.getY() < love.graphics.getHeight()-50 then
+	if love.mouse.getX() > canvasPos.x() and love.mouse.getX() < canvasPos.x2()
+			and love.mouse.getY() > canvasPos.y() and love.mouse.getY() < canvasPos.y2() then
 		scale = math.min( math.max( 1, scale + y*scale*0.05 ), 100 )
 	end
 end
 
 function love.mousemoved( x, y )
-	x, y = toCanvasCoords( x, y )
+	local x, y, inside = toCanvasCoords( x, y )
 	
 	-- Drag draw if mouse is within canvas boundaries
-	if x and love.mouse.isDown(1) then
+	if inside and love.mouse.isDown(1) then
 		selectedGlyph:setPixel( x, y, true )
 		updatePreviews()
-	elseif x and love.mouse.isDown(2) then
+	elseif inside and love.mouse.isDown(2) then
 		selectedGlyph:setPixel( x, y, false )
 		updatePreviews()
 	end

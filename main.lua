@@ -98,8 +98,15 @@ function love.draw()
 	gui:draw()
 end
 
--- Convert screen coordinates to glyph image / canvas coordinates
+-- Convert screen coordinates to canvas coordinates
 function toCanvasCoords( x, y )
+	local insideX = (x >= canvasPos.x() and x < canvasPos.x2())
+	local insideY = (y >= canvasPos.y() and y < canvasPos.y2())
+	return x-canvasPos.x(), y-canvasPos.y(), (insideX and insideY)
+end
+
+-- Convert screen coordinates to glyph image coordinates
+function toGlyphCoords( x, y )
 	x = math.floor( (x-canvasPos.x()) / math.floor(scale) )
 	y = math.floor( (y-canvasPos.y()) / math.floor(scale) )
 	local insideX = (x >= 0 and x < selectedGlyph.width)
@@ -119,7 +126,7 @@ end
 function love.mousepressed( x, y, btn )
 	gui:mousepress( x, y, btn )
 	
-	local x, y, inside = toCanvasCoords( x, y )
+	local x, y, inside = toGlyphCoords( x, y )
 	if inside then
 		-- Clicked within canvas boundaries, draw and update previews
 		selectedGlyph:setPixel( x, y, btn==1 )
@@ -142,7 +149,7 @@ function love.wheelmoved( x, y )
 end
 
 function love.mousemoved( x, y )
-	local x, y, inside = toCanvasCoords( x, y )
+	local x, y, inside = toGlyphCoords( x, y )
 	
 	-- Drag draw if mouse is within canvas boundaries
 	if inside and love.mouse.isDown(1) then

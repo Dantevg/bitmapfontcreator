@@ -150,7 +150,8 @@ function love.wheelmoved( x, y )
 end
 
 function love.mousemoved( x, y )
-	local x, y, inside = toGlyphCoords( x, y )
+	local _, _, inside = toCanvasCoords( x, y )
+	x, y = toGlyphCoords( x, y )
 	
 	-- Drag draw if mouse is within canvas boundaries
 	if inside and love.mouse.isDown(1) then

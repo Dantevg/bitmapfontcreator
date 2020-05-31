@@ -57,6 +57,7 @@ end
 
 -- Set the pixel at position (x,y) to value
 function glyph:setPixel( x, y, value )
+	x, y = math.floor(x), math.floor(y)
 	self:autoresize( x, y ) -- Auto resize if pixel was out of range
 	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	self:autoresize()

@@ -105,25 +105,25 @@ local function addGlyphOptionElement( location, label, value )
 	y = y+30
 end
 
-addGlyphOptionElement( "width", nil, 1 )
-addGlyphOptionElement( "height", nil, 1 )
-addGlyphOptionElement( "advance", nil, 1 )
+-- addGlyphOptionElement( "width", nil, 1 )
+-- addGlyphOptionElement( "height", nil, 1 )
+-- addGlyphOptionElement( "advance", nil, 1 )
 
-local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
-applyToAllButton.click = function()
-	print("Apply glyph options to all")
-	for _, glyph in ipairs(selectedLayer.glyphs) do
-		glyph:resize( selectedGlyph.width, selectedGlyph.height )
-		glyph.advance = selectedGlyph.advance
-	end
-end
-y = y+30
+-- local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
+-- applyToAllButton.click = function()
+-- 	print("Apply glyph options to all")
+-- 	for _, glyph in ipairs(selectedLayer.glyphs) do
+-- 		glyph:resize( selectedGlyph.width, selectedGlyph.height )
+-- 		glyph.advance = selectedGlyph.advance
+-- 	end
+-- end
+-- y = y+30
 
 local clearGlyphButton = gui:button( "Clear glyph", {10, y, 180, 20}, glyphOptionsList )
 clearGlyphButton.click = function()
 	print("Clear glyph")
 	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
-	selectedGlyph.image = nil
+	selectedGlyph.images = {}
 	updatePreviews()
 end
 y = y+30

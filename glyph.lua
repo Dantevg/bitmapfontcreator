@@ -42,10 +42,10 @@ function glyph:getContours(scale)
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
-				{ name = "point", attr = {x = x*scale,     y = (self.height-y) * scale,     type="line"} },
-				{ name = "point", attr = {x = (x+1)*scale, y = (self.height-y) * scale,     type="line"} },
-				{ name = "point", attr = {x = (x+1)*scale, y = (self.height-(y+1)) * scale, type="line"} },
-				{ name = "point", attr = {x = x*scale,     y = (self.height-(y+1)) * scale, type="line"} },
+				{ name = "point", attr = {x = x*scale,     y = y*scale,     type="line"} },
+				{ name = "point", attr = {x = (x+1)*scale, y = y*scale,     type="line"} },
+				{ name = "point", attr = {x = (x+1)*scale, y = (y+1)*scale, type="line"} },
+				{ name = "point", attr = {x = x*scale,     y = (y+1)*scale, type="line"} },
 			} )
 		end
 		
@@ -81,7 +81,7 @@ function glyph:getImage(scale)
 	elseif not self.images[scale] then
 		local canvas = love.graphics.newCanvas( self.imageData:getWidth()*scale, self.imageData:getHeight()*scale )
 		canvas:renderTo(function()
-			love.graphics.draw( self:getImage(), 0, 0, 0, scale, scale )
+			love.graphics.draw( self:getImage(), 0, self.height*scale, 0, scale, -scale )
 		end)
 		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	end

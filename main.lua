@@ -81,23 +81,25 @@ end
 function love.draw()
 	love.graphics.clear( 0.1, 0.1, 0.1 )
 	
-	-- Draw glyph background
-	-- love.graphics.setColor( 0, 0, 0 )
-	-- love.graphics.rectangle( "fill", glyphPos.x(), glyphPos.y(),
-	-- 	selectedGlyph.width*scaleRound,
-	-- 	selectedGlyph.height*scaleRound )
-	
 	-- Draw glyph
 	love.graphics.setColor( 1, 1, 1 )
 	love.graphics.draw( selectedGlyph:getImage(), glyphPos.x(), glyphPos.y(), 0, scaleRound, -scaleRound )
 	
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then
-		love.graphics.setColor( 0.3, 0.3, 0.3, 0.5 )
+		love.graphics.setColor( 0.5, 0.5, 0.5, 0.1 )
 		for x = glyphPos.x(), canvasPos.x2(), scaleRound do
 			love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
 		end
 		for y = glyphPos.y(), canvasPos.y(), -scaleRound do
+			love.graphics.line( canvasPos.x(), y, canvasPos.x2(), y )
+		end
+		
+		love.graphics.setColor( 1, 1, 1, 0.2 )
+		for x = glyphPos.x(), canvasPos.x2(), scaleRound*5 do
+			love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
+		end
+		for y = glyphPos.y(), canvasPos.y(), -scaleRound*5 do
 			love.graphics.line( canvasPos.x(), y, canvasPos.x2(), y )
 		end
 	end

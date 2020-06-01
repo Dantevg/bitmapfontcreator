@@ -44,6 +44,7 @@ glyphPos.h = function() return selectedGlyph.height * scaleRound end
 glyphPos.x2 = function() return glyphPos.x() + glyphPos.w() end
 glyphPos.y2 = function() return glyphPos.y() + glyphPos.h() end
 
+local drawingCanvas = false
 local draggingAdvanceLine = false
 
 function round(val) -- Round X.5 towards positive infinity
@@ -144,7 +145,7 @@ function toGlyphCoords( x, y )
 end
 
 function setCursor( x, y, inside )
-	if love.mouse.isDown(3) then
+	if love.mouse.isDown(3) and inside then
 		love.mouse.setCursor( love.mouse.getSystemCursor("sizeall") )
 	elseif draggingAdvanceLine or (inside and math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
 		love.mouse.setCursor( love.mouse.getSystemCursor("sizewe") )
@@ -168,6 +169,7 @@ function love.mousepressed( x, y, btn )
 	local _, _, inside = toCanvasCoords( x, y )
 	setCursor( x, y, inside )
 	
+	drawingCanvas = inside
 	if inside and btn == 1 or btn == 2 then -- Click within canvas boundaries
 		if math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10 then
 			draggingAdvanceLine = true
@@ -182,6 +184,7 @@ end
 function love.mousereleased( x, y, btn )
 	gui:mouserelease( x, y, btn )
 	
+	drawingCanvas = false
 	draggingAdvanceLine = false
 	setCursor( x, y, select( 3, toCanvasCoords(x,y) ) )
 end
@@ -204,7 +207,7 @@ function love.mousemoved( x, y, dx, dy )
 	
 	if draggingAdvanceLine then
 		selectedGlyph.advance = round(x)
-	elseif inside then -- Drag draw if mouse is within canvas boundaries
+	elseif inside and drawingCanvas then -- Drag draw if mouse is within canvas boundaries
 		if love.mouse.isDown(1) then
 			selectedGlyph:setPixel( x, y, true )
 			updatePreviews()

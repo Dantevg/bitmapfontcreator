@@ -118,7 +118,7 @@ function love.draw()
 	local x = canvasPos.x()+5
 	for i = 1, #sentence do
 		local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
-		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-70, 0, 2, 2 )
+		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-55, 0, 2, -2 )
 		x = x+glyph.advance*2
 	end
 	

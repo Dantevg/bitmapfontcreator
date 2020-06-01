@@ -223,6 +223,7 @@ function love.resize()
 end
 
 function love.directorydropped(path)
+	print("Loading font")
 	fnt = font.load(path)
 	
 	selectedLayer = fnt.layers[1]

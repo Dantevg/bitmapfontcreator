@@ -40,6 +40,11 @@ compileFontButton.click = function(self)
 	print("Compile font")
 	-- local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
 	local path = love.filesystem.getSaveDirectory().."/"..fnt.family
+	if not love.filesystem.getInfo(path) then -- Path doesn't exist, save font first
+		io.write("Saving font... ")
+		fnt:save()
+		io.write("Done.\n")
+	end
 	local command = "fontmake -u "..path..".ufo --output-path "..path..".ttf"
 	print("Executing "..command..":\n")
 	os.execute(command)

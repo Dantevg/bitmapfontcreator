@@ -241,6 +241,8 @@ for _, glyph in ipairs(selectedLayer.glyphs) do
 			glyphButton:click()
 		end
 		
+		table.insert( combiningGlyphButtons, glyphButton )
+		
 		y = y+1
 	end
 end

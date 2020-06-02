@@ -143,53 +143,108 @@ local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:
 
 -- GLYPHS (left)
 
-local glyphsList = gui:scrollgroup( nil, {0, 0, glyphListWidth, love.graphics.getHeight()}, nil, "vertical" )
+local glyphsList = gui:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
 glyphsList.scrollv.style.hs = "auto"
 glyphsList:setfont(24)
 local glyphButtons = {}
-local glyphCodepoints = {}
 local glyphImages = {}
 
-for i, glyph in ipairs(selectedLayer.glyphs) do
-	local glyphButton = gui:button(glyph.char, {0, (i-1)*50, 50, 50}, glyphsList )
-	glyphButton.click = function(self)
-		if not fnt then return end
-		print("Selected glyph "..glyph.name)
-		selectedGlyph = glyph
-		
-		-- Reset colours of other elements
-		for _, btn in ipairs(glyphButtons) do
-			btn.style.hilite = gui.style.hilite
-			btn.style.focus = gui.style.focus
-			btn.style.fg = gui.style.fg
-		end
-		
-		-- Set this element's colour
-		self.style.hilite = {255,255,255,255}
-		self.style.focus = {255,255,255,255}
-		self.style.fg = {0,0,0,255}
-		
-		-- Update glyph options
-		for _, option in ipairs(glyphOptionsList.children) do
-			if option.elementtype == "input" then
-				option.value = tostring( selectedGlyph[option.label] )
+local y = 0
+for _, glyph in ipairs(selectedLayer.glyphs) do
+	if glyph.char then
+		local glyphButton = gui:button(glyph.char, {0, y*50, 50, 50}, glyphsList )
+		glyphButton.click = function(self)
+			if not fnt then return end
+			print("Selected glyph "..glyph.name)
+			selectedGlyph = glyph
+			
+			-- Reset colours of other elements
+			for _, btn in ipairs(glyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
 			end
+			
+			-- Set this element's colour
+			self.style.hilite = {255,255,255,255}
+			self.style.focus = {255,255,255,255}
+			self.style.fg = {0,0,0,255}
+			
+			-- Update glyph options
+			for _, option in ipairs(glyphOptionsList.children) do
+				if option.elementtype == "input" then
+					option.value = tostring( selectedGlyph[option.label] )
+				end
+			end
+			updatePreviews()
 		end
-		updatePreviews()
+		
+		-- Make sure selected glyph is selected visually, at load
+		if glyph == selectedGlyph then
+			glyphButton:click()
+		end
+		
+		local glyphCodepoint = gui:text( string.format("0x%X",glyph.unicode), {0, y*50+35, 50, 50}, glyphsList )
+		glyphCodepoint:setfont(10)
+		
+		local glyphImage = gui:image( nil, {60, y*50+5, 50, 50}, glyphsList )
+		table.insert( glyphButtons, glyphButton )
+		glyphImages[glyph] = glyphImage
+		
+		y = y+1
 	end
-	
-	-- Make sure selected glyph is selected visually, at load
-	if glyph == selectedGlyph then
-		glyphButton:click()
-	end
-	
-	local glyphCodepoint = gui:text( string.format("0x%X",glyph.unicode), {0, (i-1)*50+35, 50, 50}, glyphsList )
-	glyphCodepoint:setfont(10)
-	
-	local glyphImage = gui:image( nil, {60, (i-1)*50+5, 50, 50}, glyphsList )
-	table.insert( glyphButtons, glyphButton )
-	glyphImages[glyph] = glyphImage
 end
+
+
+
+
+
+-- COMBINING GLYPHS LIST
+
+local combiningGlyphsList = gui:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
+combiningGlyphsList.scrollv.style.hs = "auto"
+combiningGlyphsList:setfont(12)
+local combiningGlyphButtons = {}
+
+y = 0
+for _, glyph in ipairs(selectedLayer.glyphs) do
+	if not glyph.char then
+		local glyphButton = gui:button(glyph.name, {0, y*50, 100, 50}, combiningGlyphsList )
+		glyphButton.click = function(self)
+			if not fnt then return end
+			print("Selected glyph "..glyph.name)
+			selectedGlyph = glyph
+			
+			-- Reset colours of other elements
+			for _, btn in ipairs(combiningGlyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
+			end
+			
+			-- Set this element's colour
+			self.style.hilite = {255,255,255,255}
+			self.style.focus = {255,255,255,255}
+			self.style.fg = {0,0,0,255}
+			
+			-- Update glyph options
+			for _, option in ipairs(glyphOptionsList.children) do
+				if option.elementtype == "input" then
+					option.value = tostring( selectedGlyph[option.label] )
+				end
+			end
+			updatePreviews()
+		end
+		
+		-- Make sure selected glyph is selected visually, at load
+		if glyph == selectedGlyph then
+			glyphButton:click()
+		end
+		
+		y = y+1
+	end
+end
+combiningGlyphsList:hide()
 
 function updatePreviews(all)
 	glyphPreview:setimage( selectedGlyph:getImage() )
@@ -208,7 +263,32 @@ function updatePreviews(all)
 			image:setimage( glyph:getImage(math.floor(maxScale)) )
 		end
 	else
-		glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+		if selectedGlyph.char then
+			glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+		end
+	end
+end
+
+
+
+
+
+-- GLYPH NORMAL/COMBINING SELECTOR
+
+local glyphTypeSelector = gui:button( "Normal", {0, 0, glyphListWidth+16, 50} )
+glyphTypeSelector:setfont(12)
+
+glyphTypeSelector.click = function(self)
+	if self.label == "Combining" then
+		self.label = "Normal"
+		combiningGlyphsList:hide()
+		glyphsList:show()
+		print("Selected normal glyphs")
+	else
+		self.label = "Combining"
+		glyphsList:hide()
+		combiningGlyphsList:show()
+		print("Selected combining glyphs")
 	end
 end
 

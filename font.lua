@@ -40,10 +40,26 @@ function font.new(options)
 		} )
 	end
 	
+	local function addCombiningGlyph(name)
+		table.insert( fnt.layers[1].glyphs, glyph.newCombining{
+			name = name,
+			width = 5,                -- Default empty width
+			height = fnt.height or 7, -- Default empty height
+			advance = 6,              -- Default empty advance
+		} )
+	end
+	
 	-- Pre-fill glyphs array with empty glyphs (the ones which have a name in aglfn, at least)
 	for i = 32, 255 do
 		if aglfn.getName(i) then addGlyph(i) end
 	end
+	
+	-- Pre-fill glyphs array with empty combining glyphs
+	addCombiningGlyph("acutecmb")
+	addCombiningGlyph("brevecmb")
+	addCombiningGlyph("tildecmb")
+	addCombiningGlyph("circumflexcmb")
+	addCombiningGlyph("ringcmb")
 	
 	return setmetatable( fnt, {__index = font} )
 end

@@ -33,6 +33,25 @@ function glyph.new(options)
 	}, {__index = glyph} )
 end
 
+function glyph.newCombining(options)
+	if not options then error("Expected options") end
+	if not options.imageData and (not options.width or not options.height) then
+		error("Expected imageData or width, height")
+	end
+	if not options.name then error("Expected name") end
+	
+	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
+	
+	return setmetatable( {
+		name = options.name,
+		width = options.width or imageData:getWidth(),
+		height = options.height or imageData:getHeight(),
+		advance = options.advance or (options.width or imageData:getWidth())+1,
+		imageData = imageData,
+		images = {},
+	}, {__index = glyph} )
+end
+
 -- Returns the contours of the glyph, pixel by pixel
 -- TODO: optimize
 function glyph:getContours(scale)

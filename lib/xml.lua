@@ -53,6 +53,16 @@ function xml.input.plist(input)
 	return plist
 end
 
+function xml.input.attributes(input)
+	local attr = {}
+	
+	for i = 1, #input do
+		attr[ input[i].name ] = input[i].args
+	end
+	
+	return attr
+end
+
 setmetatable( xml.input, {__call = function( _, input )
 	if not input then return end
 	if not xml.input[input.name] then error("Incompatible xml element: "..input.name) end

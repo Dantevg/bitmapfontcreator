@@ -80,7 +80,7 @@ function font.load(path)
 			table.insert( layer.glyphs, font.inputfiles.glif( fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name ) )
 		end
 		table.sort( layer.glyphs, function(a,b)
-			return a.unicode < b.unicode
+			return a.unicode and b.unicode and a.unicode < b.unicode
 		end )
 	end
 	
@@ -140,22 +140,23 @@ function font.inputfiles.glyphs_contents( fnt, input )
 end
 
 function font.inputfiles.glif( fnt, input, name )
-	local glif = xmlread(input)[2]
+	local glif = xml.input.attributes( xmlread(input)[2] )
 	local options = {name = name}
 	
-	for i = 1, #glif do
-		if glif[i].name == "unicode" then
-			options.unicode = tonumber( glif[i].args.hex, 16 )
-		elseif glif[i].name == "advance" then
-			options.advance = tonumber( glif[i].args.width ) / font.scale
-		elseif glif[i].name == "image" then
-			options.imageData = love.image.newImageData( ".temp/images/"..glif[i].args.fileName )
-		elseif glif[i].name == "outline" then
-			-- TODO: read outline to image
-		end
+	if glif.unicode then
+		options.unicode = tonumber( glif.unicode.hex, 16 )
+	end
+	if glif.advance then
+		options.advance = tonumber( glif.advance.width ) / font.scale
+	end
+	if glif.image then
+		options.imageData = love.image.newImageData( ".temp/images/"..glif.image.fileName )
+	end
+	if glif.outline then
+		-- TODO: read outline to image
 	end
 	
-	return glyph.new(options)
+	return options.unicode and glyph.new(options) or glyph.newCombining(options)
 end
 
 

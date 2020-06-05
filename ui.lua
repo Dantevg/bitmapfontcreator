@@ -70,7 +70,7 @@ function gui.fontOptions(fnt)
 		local input = gui.gspot:input( label or location, {0, y, 200, 20}, gui.elements.fontOptionsList, fnt[location] )
 		input.done = function(self)
 			fnt[location] = self.value
-			print("Set font."..location.." to "..self.value)
+			print("[INFO] Set font."..location.." to "..self.value)
 			self.Gspot:unfocus()
 		end
 		y = y+30
@@ -144,7 +144,7 @@ function gui.glyphOptions(fnt)
 	local function addGlyphOptionElement( location, label, value )
 		local input = gui.gspot:input( label or location, {0, y, 200, 20}, gui.elements.glyphOptionsList, value )
 		input.done = function(self)
-			print("Set glyph."..location.." to "..self.value)
+			print("[INFO] Set glyph."..location.." to "..self.value)
 			selectedGlyph[location] = tonumber(self.value)
 			if self.label == "width" or self.label == "height" then
 				selectedGlyph:resize()
@@ -175,7 +175,7 @@ function gui.glyphOptions(fnt)
 	
 	local clearGlyphButton = gui.gspot:button( "Clear glyph", {10, y, 180, 20}, gui.elements.glyphOptionsList )
 	clearGlyphButton.click = function()
-		print("Clear glyph")
+		print("[INFO] Clear glyph")
 		selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
 		selectedGlyph.images = {}
 		gui.updatePreviews()
@@ -210,7 +210,7 @@ function gui.glyphs(fnt)
 			local glyphButton = gui.gspot:button(glyph.char, {0, y*50, 50, 50}, gui.elements.glyphsList )
 			glyphButton.click = function(self)
 				if not fnt then return end
-				print("Selected glyph "..glyph.name)
+				print("[LOG]  Selected glyph "..glyph.name)
 				selectedGlyph = glyph
 				
 				-- Reset colours of other elements
@@ -279,7 +279,7 @@ function gui.combiningGlyphs(fnt)
 			local glyphButton = gui.gspot:button(glyph.name, {0, y*50, 100, 50}, gui.elements.combiningGlyphsList )
 			glyphButton.click = function(self)
 				if not fnt then return end
-				print("Selected glyph "..glyph.name)
+				print("[LOG]  Selected glyph "..glyph.name)
 				selectedGlyph = glyph
 				
 				-- Reset colours of other elements
@@ -344,12 +344,12 @@ function gui.combiningSelector(fnt)
 			self.label = "Normal"
 			gui.elements.combiningGlyphsList:hide()
 			gui.elements.glyphsList:show()
-			print("Selected normal glyphs")
+			print("[LOG]  Selected normal glyphs")
 		else
 			self.label = "Combining"
 			gui.elements.glyphsList:hide()
 			gui.elements.combiningGlyphsList:show()
-			print("Selected combining glyphs")
+			print("[LOG]  Selected combining glyphs")
 		end
 	end
 end

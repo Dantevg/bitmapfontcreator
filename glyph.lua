@@ -124,7 +124,7 @@ end
 function glyph:resize( width, height )
 	width, height = width or self.width, height or self.height
 	if width == self.width and height == self.height then return end
-	print("Resized glyph "..self.name.." to "..width..", "..height)
+	print("[INFO] Resized glyph "..self.name.." to "..width..", "..height)
 	
 	self.width, self.height = width, height
 	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
@@ -155,12 +155,13 @@ function glyph:addComponent( glyph, x, y )
 	-- Prevent adding component which has self as component
 	for _, component in ipairs(glyph.components) do
 		if component.glyph == self then
+			print("[INFO] Couldn't add component: component already contains self")
 			return false, "Component already contains self, infinite recursion detected"
 		end
 	end
 	table.insert( glyph.isComponentOf, self )
 	table.insert( self.components, {glyph = glyph, x = x, y = y} )
-	print("Added component glyph "..glyph.name.." to "..self.name)
+	print("[INFO] Added component glyph "..glyph.name.." to "..self.name)
 	return true
 end
 
@@ -174,19 +175,19 @@ function glyph:removeComponent(glyph)
 			for i = 1, #glyph.isComponentOf do
 				if glyph.isComponentOf[i] == self then
 					table.remove( glyph.isComponentOf, i )
-					print("Removed component "..glyph.name)
+					print("[INFO] Removed component "..glyph.name)
 					return true -- Remove successful
 				end
 			end
 			
-			print("Couldn't remove self from component's ("..glyph.name..") list")
+			print("[WARN] Couldn't remove self from component's ("..glyph.name..") list")
 			return false
 			
 		end
 	end
 	
 	-- Component wasn't present, can't remove
-	print("Couldn't remove component "..glyph.name)
+	print("[WARN] Couldn't remove component "..glyph.name)
 	return false
 end
 

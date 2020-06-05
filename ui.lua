@@ -91,6 +91,48 @@ end
 
 -- GLYPH OPTIONS (bottom right)
 
+local glyphComponentY
+function gui.glyphComponents(y)
+	y = y or glyphComponentY
+	glyphComponentY = y
+	
+	gui.elements.glyphComponentsList = gui.gspot:group( "Components", {10, y, 180, 100}, gui.elements.glyphOptionsList )
+	gui.elements.glyphComponentsList.style.bg = {40, 40, 40, 255}
+	local addComponentButton = gui.gspot:button( "Add", {0, 0, 40, 20}, gui.elements.glyphComponentsList )
+	addComponentButton.click = function(self)
+		selectedGlyph:addComponent( selectedLayer.glyphs[math.random(1,128)], 0, 0 ) -- TODO: remove random
+		gui.gspot:rem(gui.elements.glyphComponentsList)
+		gui.glyphComponents()
+	end
+	
+	for i, component in ipairs(selectedGlyph.components) do
+		local componentGroup = gui.gspot:group( nil, {0, i*20, 180, 20}, gui.elements.glyphComponentsList )
+		gui.gspot:text( component.glyph.name, {0, 0, 100, 20}, componentGroup )
+		local xInput = gui.gspot:input( "", {118, 0, 20, 19}, componentGroup, component.x )
+		xInput.done = function(self)
+			component.x = self.value
+			selectedGlyph.images = {}
+			gui.updatePreviews()
+			self.Gspot[self.elementtype].done(self)
+		end
+		
+		local yInput = gui.gspot:input( "", {139, 0, 20, 19}, componentGroup, component.y )
+		yInput.done = function(self)
+			component.y = self.value
+			selectedGlyph.images = {}
+			gui.updatePreviews()
+			self.Gspot[self.elementtype].done(self)
+		end
+		
+		local removeBtn = gui.gspot:button( "-", {160, 0, 20, 19}, componentGroup )
+		removeBtn.click = function()
+			selectedGlyph:removeComponent( component.glyph )
+			gui.gspot:rem(gui.elements.glyphComponentsList)
+			gui.glyphComponents()
+		end
+	end
+end
+
 function gui.glyphOptions(fnt)
 	gui.elements.glyphOptionsList = gui.gspot:group( "Glyph options", {
 		love.graphics.getWidth()-200, love.graphics.getHeight()/2,
@@ -140,8 +182,8 @@ function gui.glyphOptions(fnt)
 	end
 	y = y+30
 	
-	gui.elements.glyphComponentsList = gui.gspot:group( "Components", {10, y, 180, 100}, gui.elements.glyphOptionsList )
-	gui.elements.glyphComponentsList.style.bg = {40, 40, 40, 255}
+	gui.glyphComponents(y)
+	
 	y = y+110
 	
 	gui.elements.glyphPreview = gui.gspot:image( nil, {10, y}, gui.elements.glyphOptionsList, selectedGlyph:getImage() )
@@ -194,7 +236,9 @@ function gui.glyphs(fnt)
 						option.value = tostring( selectedGlyph[option.label] )
 					end
 				end
-				gui.updateGlyphComponents()
+				gui.gspot:rem(gui.elements.glyphComponentsList)
+				gui.glyphComponents()
+				glyph.images = {}
 				gui.updatePreviews()
 			end
 			
@@ -261,7 +305,9 @@ function gui.combiningGlyphs(fnt)
 						option.value = tostring( selectedGlyph[option.label] )
 					end
 				end
-				gui.updateGlyphComponents()
+				gui.gspot:rem(gui.elements.glyphComponentsList)
+				gui.glyphComponents()
+				glyph.images = {}
 				gui.updatePreviews()
 			end
 			
@@ -340,7 +386,9 @@ end
 function gui.updateGlyphComponents()
 	-- Empty old glyph components list
 	for _, glyphComponentElement in ipairs(gui.elements.glyphComponentsList.children) do
-		gui.gspot:rem(glyphComponentElement)
+		if glyphComponentElement.elementtype ~= "button" then
+			gui.gspot:rem(glyphComponentElement)
+		end
 	end
 	
 	-- Fill glyph components list

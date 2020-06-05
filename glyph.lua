@@ -29,6 +29,7 @@ function glyph.new(options)
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
 		components = {},
+		isComponentOf = {},
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
@@ -49,6 +50,7 @@ function glyph.newCombining(options)
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
 		components = {},
+		isComponentOf = {},
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
@@ -156,19 +158,32 @@ function glyph:addComponent( glyph, x, y )
 			return false, "Component already contains self, infinite recursion detected"
 		end
 	end
+	table.insert( glyph.isComponentOf, self )
 	table.insert( self.components, {glyph = glyph, x = x, y = y} )
 	print("Added component glyph "..glyph.name.." to "..self.name)
 	return true
 end
 
 function glyph:removeComponent(glyph)
+	-- Remove component from self list
 	for i, component in ipairs(self.components) do
 		if component.glyph == glyph then
 			table.remove( self.components, i )
-			return true -- Remove successful
+			
+			-- Remove self from isComponentOf list
+			for i = 1, #glyph.isComponentOf do
+				if glyph.isComponentOf[i] == self then
+					table.remove( glyph.isComponentOf, i )
+					print("Removed component "..glyph.name)
+					return true -- Remove successful
+				end
+			end
+			
 		end
 	end
+	
 	-- Component wasn't present, can't remove
+	print("Couldn't remove component "..glyph.name)
 	return false
 end
 

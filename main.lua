@@ -144,8 +144,12 @@ function toGlyphCoords( x, y )
 	return x, y, (insideX and insideY)
 end
 
+function isDragging()
+	return love.mouse.isDown(3) or love.keyboard.isDown("lctrl")
+end
+
 function setCursor( x, y, inside )
-	if love.mouse.isDown(3) and inside then
+	if isDragging() and inside then
 		love.mouse.setCursor( love.mouse.getSystemCursor("sizeall") )
 	elseif draggingAdvanceLine or (inside and math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10) then
 		love.mouse.setCursor( love.mouse.getSystemCursor("sizewe") )
@@ -170,7 +174,7 @@ function love.mousepressed( x, y, btn )
 	setCursor( x, y, inside )
 	
 	drawingCanvas = inside
-	if inside and btn == 1 or btn == 2 then -- Click within canvas boundaries
+	if inside and not isDragging() then -- Click within canvas boundaries
 		if math.abs( glyphPos.x() + selectedGlyph.advance*scaleRound - x ) < 10 then
 			draggingAdvanceLine = true
 		else -- Draw and update previews
@@ -208,15 +212,15 @@ function love.mousemoved( x, y, dx, dy )
 	if draggingAdvanceLine then
 		selectedGlyph.advance = round(x)
 	elseif inside and drawingCanvas then -- Drag draw if mouse is within canvas boundaries
-		if love.mouse.isDown(1) then
+		if isDragging() then
+			glyphPos._x = glyphPos._x + dx
+			glyphPos._y = glyphPos._y + dy
+		elseif love.mouse.isDown(1) then
 			selectedGlyph:setPixel( x, y, true )
 			updatePreviews()
 		elseif love.mouse.isDown(2) then
 			selectedGlyph:setPixel( x, y, false )
 			updatePreviews()
-		elseif love.mouse.isDown(3) then
-			glyphPos._x = glyphPos._x + dx
-			glyphPos._y = glyphPos._y + dy
 		end
 	end
 end

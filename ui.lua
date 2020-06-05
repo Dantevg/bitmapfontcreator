@@ -140,9 +140,8 @@ function gui.glyphOptions(fnt)
 	end
 	y = y+30
 	
-	local componentsList = gui.gspot:group( "Components", {10, y, 180, 100}, gui.elements.glyphOptionsList )
-	componentsList.style.bg = {40, 40, 40, 255}
-	local component = gui.gspot:text( "acutecmb", {0, 20, 180, 20}, componentsList )
+	gui.elements.glyphComponentsList = gui.gspot:group( "Components", {10, y, 180, 100}, gui.elements.glyphOptionsList )
+	gui.elements.glyphComponentsList.style.bg = {40, 40, 40, 255}
 	y = y+110
 	
 	gui.elements.glyphPreview = gui.gspot:image( nil, {10, y}, gui.elements.glyphOptionsList, selectedGlyph:getImage() )
@@ -195,6 +194,7 @@ function gui.glyphs(fnt)
 						option.value = tostring( selectedGlyph[option.label] )
 					end
 				end
+				gui.updateGlyphComponents()
 				gui.updatePreviews()
 			end
 			
@@ -261,6 +261,7 @@ function gui.combiningGlyphs(fnt)
 						option.value = tostring( selectedGlyph[option.label] )
 					end
 				end
+				gui.updateGlyphComponents()
 				gui.updatePreviews()
 			end
 			
@@ -332,6 +333,24 @@ function gui.updatePreviews(all)
 	else
 		if selectedGlyph.char then
 			gui.elements.glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+		end
+	end
+end
+
+function gui.updateGlyphComponents()
+	-- Empty old glyph components list
+	for _, glyphComponentElement in ipairs(gui.elements.glyphComponentsList.children) do
+		gui.gspot:rem(glyphComponentElement)
+	end
+	
+	-- Fill glyph components list
+	for i, component in ipairs(selectedGlyph.components) do
+		local componentGroup = gui.gspot:group( nil, {0, i*20, 180, 20}, gui.elements.glyphComponentsList )
+		gui.gspot:text( component.glyph.name, {0, 0, 100, 20}, componentGroup )
+		local btn = gui.gspot:button( "-", {160, 0, 20, 20}, componentGroup )
+		btn.click = function()
+			selectedGlyph:removeComponent( component.glyph )
+			gui.updateGlyphComponents()
 		end
 	end
 end

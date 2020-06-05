@@ -161,6 +161,17 @@ function glyph:addComponent( glyph, x, y )
 	return true
 end
 
+function glyph:removeComponent(glyph)
+	for i, component in ipairs(self.components) do
+		if component.glyph == glyph then
+			table.remove( self.components, i )
+			return true -- Remove successful
+		end
+	end
+	-- Component wasn't present, can't remove
+	return false
+end
+
 
 
 -- RETURN

@@ -9,7 +9,6 @@
 
 local gui = {}
 
-gui.gspot = require("lib/Gspot"):setComponentMax(255)
 gui.elements = {}
 
 function gui.updatePreviews() end
@@ -163,7 +162,6 @@ function gui.glyphs(fnt)
 	gui.elements.glyphsList:setfont(24)
 	gui.elements.glyphButtons = {}
 	gui.elements.glyphImages = {}
-	gui.elements.combiningGlyphButtons = {}
 	
 	local y = 0
 	for _, glyph in ipairs(selectedLayer.glyphs) do
@@ -202,7 +200,9 @@ function gui.glyphs(fnt)
 			
 			-- Make sure selected glyph is selected visually, at load
 			if glyph == selectedGlyph then
-				glyphButton:click()
+				glyphButton.style.hilite = {255,255,255,255}
+				glyphButton.style.focus = {255,255,255,255}
+				glyphButton.style.fg = {0,0,0,255}
 			end
 			
 			local glyphCodepoint = gui.gspot:text( string.format("0x%X",glyph.unicode), {0, y*50+35, 50, 50}, gui.elements.glyphsList )
@@ -223,10 +223,11 @@ end
 
 -- COMBINING GLYPHS LIST
 
-function gui.combiningGlyphsList(fnt)
+function gui.combiningGlyphs(fnt)
 	gui.elements.combiningGlyphsList = gui.gspot:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
 	gui.elements.combiningGlyphsList.scrollv.style.hs = "auto"
 	gui.elements.combiningGlyphsList:setfont(12)
+	gui.elements.combiningGlyphButtons = {}
 	
 	y = 0
 	for _, glyph in ipairs(selectedLayer.glyphs) do
@@ -261,11 +262,6 @@ function gui.combiningGlyphsList(fnt)
 					end
 				end
 				gui.updatePreviews()
-			end
-			
-			-- Make sure selected glyph is selected visually, at load
-			if glyph == selectedGlyph then
-				glyphButton:click()
 			end
 			
 			table.insert( gui.elements.combiningGlyphButtons, glyphButton )
@@ -305,19 +301,6 @@ end
 
 
 
--- CREATE GUI
-
-gui.actions(fnt)
-gui.fontOptions(fnt)
-gui.glyphOptions(fnt)
-gui.glyphs(fnt)
-gui.combiningGlyphsList(fnt)
-gui.combiningSelector(fnt)
-
-
-
-
-
 -- FUNCTIONS
 
 function gui.updatePreviews(all)
@@ -341,6 +324,32 @@ function gui.updatePreviews(all)
 			gui.elements.glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
 		end
 	end
+end
+
+function gui.load(fnt)
+	gui.gspot = require("lib/Gspot"):setComponentMax(255)
+	gui.actions(fnt)
+	gui.fontOptions(fnt)
+	gui.glyphOptions(fnt)
+	gui.glyphs(fnt)
+	gui.combiningGlyphs(fnt)
+	gui.combiningSelector(fnt)
+end
+
+function gui.resize( width, height )
+	-- Reload glyphs lists because scrollgroups don't react to size changes
+	gui.gspot:rem(gui.elements.glyphsList)
+	gui.gspot:rem(gui.elements.combiningGlyphsList)
+	gui.glyphs(fnt)
+	gui.combiningGlyphs(fnt)
+	
+	gui.elements.actionsList.pos.y = height-50
+	gui.elements.actionsList.pos.w = width-200-glyphListWidth-16
+	gui.elements.fontOptionsList.pos.x = width-200
+	gui.elements.fontOptionsList.pos.h = height/2
+	gui.elements.glyphOptionsList.pos.x = width-200
+	gui.elements.glyphOptionsList.pos.y = height/2
+	gui.elements.glyphOptionsList.pos.h = height/2
 end
 
 

@@ -69,6 +69,7 @@ function love.load()
 	
 	-- Build the GUI
 	gui = require "ui"
+	gui.load(fnt)
 end
 
 function love.update(dt)
@@ -226,8 +227,7 @@ function love.mousemoved( x, y, dx, dy )
 end
 
 function love.resize()
-	package.loaded.ui = nil -- "unload" ui
-	gui = require "ui" -- reload ui
+	gui.resize( love.graphics.getWidth(), love.graphics.getHeight() )
 	gui.updatePreviews(true)
 end
 
@@ -238,7 +238,5 @@ function love.directorydropped(path)
 	selectedLayer = fnt.layers[1]
 	selectedGlyph = selectedLayer.glyphs[1]
 	
-	package.loaded.ui = nil -- "unload" ui
-	gui = require "ui" -- reload ui
-	gui.updatePreviews(true)
+	gui.load(fnt)
 end

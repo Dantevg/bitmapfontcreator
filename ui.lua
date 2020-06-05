@@ -148,6 +148,7 @@ glyphsList.scrollv.style.hs = "auto"
 glyphsList:setfont(24)
 local glyphButtons = {}
 local glyphImages = {}
+local combiningGlyphButtons = {}
 
 local y = 0
 for _, glyph in ipairs(selectedLayer.glyphs) do
@@ -160,6 +161,11 @@ for _, glyph in ipairs(selectedLayer.glyphs) do
 			
 			-- Reset colours of other elements
 			for _, btn in ipairs(glyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
+			end
+			for _, btn in ipairs(combiningGlyphButtons) do
 				btn.style.hilite = gui.style.hilite
 				btn.style.focus = gui.style.focus
 				btn.style.fg = gui.style.fg
@@ -204,7 +210,6 @@ end
 local combiningGlyphsList = gui:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
 combiningGlyphsList.scrollv.style.hs = "auto"
 combiningGlyphsList:setfont(12)
-local combiningGlyphButtons = {}
 
 y = 0
 for _, glyph in ipairs(selectedLayer.glyphs) do
@@ -217,6 +222,11 @@ for _, glyph in ipairs(selectedLayer.glyphs) do
 			
 			-- Reset colours of other elements
 			for _, btn in ipairs(combiningGlyphButtons) do
+				btn.style.hilite = gui.style.hilite
+				btn.style.focus = gui.style.focus
+				btn.style.fg = gui.style.fg
+			end
+			for _, btn in ipairs(glyphButtons) do
 				btn.style.hilite = gui.style.hilite
 				btn.style.focus = gui.style.focus
 				btn.style.fg = gui.style.fg

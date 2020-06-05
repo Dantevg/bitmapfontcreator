@@ -284,25 +284,25 @@ function font.outputfiles.glif( fnt, layer, glyph )
 		name = "glyph",
 		attr = {name = glyph.name, format = 2},
 		{
-			name = "image",
-			attr = { fileName = layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png" }
-		},
-		{
 			name = "outline",
 			unpack( glyph:getContours(font.scale) )
 		},
+		{
+			name = "image",
+			attr = { fileName = layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png" }
+		},
 	}
 	
-	if glyph.unicode then
-		table.insert( glif, {
-			name = "unicode",
-			attr = { hex = string.format( "%04x", glyph.unicode ) }
-		} )
-	end
 	if glyph.advance then
-		table.insert( glif, {
+		table.insert( glif, 1, {
 			name = "advance",
 			attr = { width = glyph.advance*font.scale }
+		} )
+	end
+	if glyph.unicode then
+		table.insert( glif, 1, {
+			name = "unicode",
+			attr = { hex = string.format( "%04x", glyph.unicode ) }
 		} )
 	end
 	

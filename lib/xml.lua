@@ -70,12 +70,12 @@ xml.output.types = {
 	number = "integer",
 }
 
-local function tag( name, attr )
+local function tag( name, attr, empty )
 	local s = "<"..name
 	for k, v in pairs( attr or {} ) do
 		s = s.." "..tostring(k)..'="'..tostring(v)..'"'
 	end
-	return s..">"
+	return empty and s.." />" or s..">"
 end
 
 function xml.output.toString( data, level )
@@ -83,11 +83,11 @@ function xml.output.toString( data, level )
 	level = level or 0
 	if level > 128 then error( "Max table depth (128) reached (recursive tables are not supported)" ) end
 	
-	local s = tag( data.name, data.attr )
+	local s = tag( data.name, data.attr, #data == 0 )
 	
 	if #data == 1 and type(data[1]) ~= "table" then
 		s = s..tostring( data[1] )
-	else
+	elseif #data > 0 then
 		for _, v in ipairs(data) do
 			if type(v) == "table" then
 				s = s.."\n"..string.rep( "    ", level+1 )..xml.output.toString( v, level+1 )
@@ -98,7 +98,7 @@ function xml.output.toString( data, level )
 		s = s.."\n"..string.rep( "    ", level )
 	end
 	
-	return s.."</"..data.name..">"
+	return #data == 0 and s or s.."</"..data.name..">"
 end
 
 function xml.output.array( input, attr, xmlType )

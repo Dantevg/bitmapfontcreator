@@ -28,6 +28,7 @@ function glyph.new(options)
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
+		components = {},
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
@@ -47,6 +48,7 @@ function glyph.newCombining(options)
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
+		components = {},
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
@@ -97,9 +99,16 @@ function glyph:getImage(scale)
 	scale = scale or 1
 	
 	if not self.images[scale] and scale == 1 then
-		self.images[scale] = love.graphics.newImage(self.imageData)
+		local canvas = love.graphics.newCanvas( self.width, self.height )
+		canvas:renderTo(function()
+			love.graphics.draw( love.graphics.newImage(self.imageData) )
+			for _, component in ipairs(self.components) do
+				love.graphics.draw( component.glyph:getImage(), component.x or 0, component.y or 0 )
+			end
+		end)
+		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	elseif not self.images[scale] then
-		local canvas = love.graphics.newCanvas( self.imageData:getWidth()*scale, self.imageData:getHeight()*scale )
+		local canvas = love.graphics.newCanvas( self.width*scale, self.height*scale )
 		canvas:renderTo(function()
 			love.graphics.draw( self:getImage(), 0, self.height*scale, 0, scale, -scale )
 		end)
@@ -113,7 +122,7 @@ end
 function glyph:resize( width, height )
 	width, height = width or self.width, height or self.height
 	if width == self.width and height == self.height then return end
-	print("Resized glyph "..self.name.." to "..self.width..", "..self.height)
+	print("Resized glyph "..self.name.." to "..width..", "..height)
 	
 	self.width, self.height = width, height
 	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
@@ -133,7 +142,21 @@ function glyph:autoresize( x, y )
 		end
 		return v, ...
 	end)
+	for _, component in ipairs(self.components) do
+		maxX = math.max( maxX, component.x + component.glyph.width )
+		maxY = math.max( maxY, component.y + component.glyph.height )
+	end
 	self:resize( maxX+1, maxY+1 )
+end
+
+function glyph:addComponent( glyph, x, y )
+	-- Prevent adding component which has self as component
+	for _, component in ipairs(glyph.components) do
+		if component.glyph == self then
+			error("Component already contains self, infinite recursion detected")
+		end
+	end
+	table.insert( self.components, {glyph = glyph, x = x, y = y} )
 end
 
 

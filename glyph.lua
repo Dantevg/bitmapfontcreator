@@ -179,6 +179,9 @@ function glyph:removeComponent(glyph)
 				end
 			end
 			
+			print("Couldn't remove self from component's ("..glyph.name..") list")
+			return false
+			
 		end
 	end
 	

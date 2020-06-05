@@ -110,6 +110,7 @@ function gui.glyphComponents(y)
 		gui.gspot:text( component.glyph.name, {0, 0, 100, 20}, componentGroup )
 		local xInput = gui.gspot:input( "", {118, 0, 20, 19}, componentGroup, component.x )
 		xInput.done = function(self)
+			print("[INFO] Set component "..component.glyph.name.." x offset to "..self.value)
 			component.x = self.value
 			selectedGlyph.images = {}
 			gui.updatePreviews()
@@ -118,6 +119,7 @@ function gui.glyphComponents(y)
 		
 		local yInput = gui.gspot:input( "", {139, 0, 20, 19}, componentGroup, component.y )
 		yInput.done = function(self)
+			print("[INFO] Set component "..component.glyph.name.." y offset to "..self.value)
 			component.y = self.value
 			selectedGlyph.images = {}
 			gui.updatePreviews()

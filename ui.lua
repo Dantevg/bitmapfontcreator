@@ -264,12 +264,22 @@ function gui.combiningGlyphs(fnt)
 				gui.updatePreviews()
 			end
 			
+			-- Make sure selected glyph is selected visually, at load
+			if glyph == selectedGlyph then
+				glyphButton.style.hilite = {255,255,255,255}
+				glyphButton.style.focus = {255,255,255,255}
+				glyphButton.style.fg = {0,0,0,255}
+			end
+			
 			table.insert( gui.elements.combiningGlyphButtons, glyphButton )
 			
 			y = y+1
 		end
 	end
-	gui.elements.combiningGlyphsList:hide()
+	
+	if not gui.elements.glyphTypeSelector or gui.elements.glyphTypeSelector.label ~= "Combining" then
+		gui.elements.combiningGlyphsList:hide()
+	end
 end
 
 

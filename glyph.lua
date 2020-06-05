@@ -153,10 +153,12 @@ function glyph:addComponent( glyph, x, y )
 	-- Prevent adding component which has self as component
 	for _, component in ipairs(glyph.components) do
 		if component.glyph == self then
-			error("Component already contains self, infinite recursion detected")
+			return false, "Component already contains self, infinite recursion detected"
 		end
 	end
 	table.insert( self.components, {glyph = glyph, x = x, y = y} )
+	print("Added component glyph "..glyph.name.." to "..self.name)
+	return true
 end
 
 

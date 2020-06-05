@@ -279,21 +279,10 @@ function font.outputfiles.glif( fnt, layer, glyph )
 	if not glyph.name or #glyph.name < 1 then
 		return false, "Glyph name must be present and not empty"
 	end
-	if not glyph.unicode then
-		return false, "Glyph unicode must be present"
-	end
 	
-	return ufo.xmlHeader.."\n"..xml.output.toString{
+	local glif = {
 		name = "glyph",
 		attr = {name = glyph.name, format = 2},
-		{
-			name = "unicode",
-			attr = { hex = string.format( "%04x", glyph.unicode ) }
-		},
-		{
-			name = "advance",
-			attr = { width = glyph.advance*font.scale }
-		},
 		{
 			name = "image",
 			attr = { fileName = layer.directory.."_"..ufo.convertToFilename(glyph.name)..".png" }
@@ -303,6 +292,21 @@ function font.outputfiles.glif( fnt, layer, glyph )
 			unpack( glyph:getContours(font.scale) )
 		},
 	}
+	
+	if glyph.unicode then
+		table.insert( glif, {
+			name = "unicode",
+			attr = { hex = string.format( "%04x", glyph.unicode ) }
+		} )
+	end
+	if glyph.advance then
+		table.insert( glif, {
+			name = "advance",
+			attr = { width = glyph.advance*font.scale }
+		} )
+	end
+	
+	return ufo.xmlHeader.."\n"..xml.output.toString(glif)
 end
 
 function font:generateXML( what, ... )

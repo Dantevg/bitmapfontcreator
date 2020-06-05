@@ -7,9 +7,12 @@
 	
 ]]--
 
-local gui = require("lib/Gspot"):setComponentMax(255)
+local gui = {}
 
-function updatePreviews() end
+gui.gspot = require("lib/Gspot"):setComponentMax(255)
+gui.elements = {}
+
+function gui.updatePreviews() end
 
 
 
@@ -17,38 +20,40 @@ function updatePreviews() end
 
 -- ACTIONS (bottom)
 
-local actionsList = gui:group( "Actions", {
-	glyphListWidth+16, love.graphics.getHeight()-50, 
-	love.graphics.getWidth()-200-glyphListWidth-16, 50
-} )
-actionsList:setfont(12)
-local loadFontButton = gui:button( "Load", {0, 0, 100, 50}, actionsList )
-local saveFontButton = gui:button( "Save", {110, 0, 100, 50}, actionsList )
-local compileFontButton = gui:button( "Compile", {220, 0, 100, 50}, actionsList )
-
-loadFontButton.click = function(self)
-	print("Load font")
-end
-
-saveFontButton.click = function(self)
-	io.write("Saving font... ")
-	fnt:save()
-	io.write("Done.\n")
-end
-
-compileFontButton.click = function(self)
-	print("Compile font")
-	-- local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
-	local path = love.filesystem.getSaveDirectory().."/"..fnt.family
-	if not love.filesystem.getInfo(path) then -- Path doesn't exist, save font first
+function gui.actions(fnt)
+	gui.elements.actionsList = gui.gspot:group( "Actions", {
+		glyphListWidth+16, love.graphics.getHeight()-50, 
+		love.graphics.getWidth()-200-glyphListWidth-16, 50
+	} )
+	gui.elements.actionsList:setfont(12)
+	local loadFontButton = gui.gspot:button( "Load", {0, 0, 100, 50}, gui.elements.actionsList )
+	local saveFontButton = gui.gspot:button( "Save", {110, 0, 100, 50}, gui.elements.actionsList )
+	local compileFontButton = gui.gspot:button( "Compile", {220, 0, 100, 50}, gui.elements.actionsList )
+	
+	loadFontButton.click = function(self)
+		print("Load font")
+	end
+	
+	saveFontButton.click = function(self)
 		io.write("Saving font... ")
 		fnt:save()
 		io.write("Done.\n")
 	end
-	local command = "fontmake -u "..path..".ufo --output-path "..path..".ttf"
-	print("Executing "..command..":\n")
-	os.execute(command)
-	print("\nDone.")
+	
+	compileFontButton.click = function(self)
+		print("Compile font")
+		-- local fontmakePath = love.filesystem.getSource().."/fontmake/fontmake.pyz"
+		local path = love.filesystem.getSaveDirectory().."/"..fnt.family
+		if not love.filesystem.getInfo(path) then -- Path doesn't exist, save font first
+			io.write("Saving font... ")
+			fnt:save()
+			io.write("Done.\n")
+		end
+		local command = "fontmake -u "..path..".ufo --output-path "..path..".ttf"
+		print("Executing "..command..":\n")
+		os.execute(command)
+		print("\nDone.")
+	end
 end
 
 
@@ -57,27 +62,29 @@ end
 
 -- FONT OPTIONS (top right)
 
-local fontOptionsList = gui:group( "Font options", {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()/2} )
-fontOptionsList:setfont(12)
-local y = 20
-
-local function addFontOptionElement( location, label )
-	local input = gui:input( label or location, {0, y, 200, 20}, fontOptionsList, fnt[location] )
-	input.done = function(self)
-		fnt[location] = self.value
-		print("Set font."..location.." to "..self.value)
-		self.Gspot:unfocus()
+function gui.fontOptions(fnt)
+	gui.elements.fontOptionsList = gui.gspot:group( "Font options", {love.graphics.getWidth()-200, 0, 200, love.graphics.getHeight()/2} )
+	gui.elements.fontOptionsList:setfont(12)
+	local y = 20
+	
+	local function addFontOptionElement( location, label )
+		local input = gui.gspot:input( label or location, {0, y, 200, 20}, gui.elements.fontOptionsList, fnt[location] )
+		input.done = function(self)
+			fnt[location] = self.value
+			print("Set font."..location.." to "..self.value)
+			self.Gspot:unfocus()
+		end
+		y = y+30
 	end
-	y = y+30
+	
+	addFontOptionElement("family", "family name")
+	addFontOptionElement("author")
+	addFontOptionElement("style", "variant")
+	addFontOptionElement("version")
+	addFontOptionElement("year")
+	addFontOptionElement("copyright")
+	addFontOptionElement("trademark")
 end
-
-addFontOptionElement("family", "family name")
-addFontOptionElement("author")
-addFontOptionElement("style", "variant")
-addFontOptionElement("version")
-addFontOptionElement("year")
-addFontOptionElement("copyright")
-addFontOptionElement("trademark")
 
 
 
@@ -85,57 +92,64 @@ addFontOptionElement("trademark")
 
 -- GLYPH OPTIONS (bottom right)
 
-local glyphOptionsList = gui:group( "Glyph options", {
-	love.graphics.getWidth()-200, love.graphics.getHeight()/2,
-	200,                          love.graphics.getHeight()/2
-} )
-glyphOptionsList:setfont(12)
-y = 20
-
-local function addGlyphOptionElement( location, label, value )
-	local input = gui:input( label or location, {0, y, 200, 20}, glyphOptionsList, value )
-	input.done = function(self)
-		print("Set glyph."..location.." to "..self.value)
-		selectedGlyph[location] = tonumber(self.value)
-		if self.label == "width" or self.label == "height" then
-			selectedGlyph:resize()
-			updatePreviews()
+function gui.glyphOptions(fnt)
+	gui.elements.glyphOptionsList = gui.gspot:group( "Glyph options", {
+		love.graphics.getWidth()-200, love.graphics.getHeight()/2,
+		200,                          love.graphics.getHeight()/2
+	} )
+	gui.elements.glyphOptionsList:setfont(12)
+	y = 20
+	
+	local function addGlyphOptionElement( location, label, value )
+		local input = gui.gspot:input( label or location, {0, y, 200, 20}, gui.elements.glyphOptionsList, value )
+		input.done = function(self)
+			print("Set glyph."..location.." to "..self.value)
+			selectedGlyph[location] = tonumber(self.value)
+			if self.label == "width" or self.label == "height" then
+				selectedGlyph:resize()
+				gui.updatePreviews()
+			end
+			self.Gspot:unfocus()
 		end
-		self.Gspot:unfocus()
+		input.keypress = function( self, key, code )
+			self.Gspot[self.elementtype].keypress( self, key, code )
+			self.value = self.value:gsub("%D+", "") -- Remove all non-number characters
+		end
+		y = y+30
 	end
-	input.keypress = function( self, key, code )
-		self.Gspot[self.elementtype].keypress( self, key, code )
-		self.value = self.value:gsub("%D+", "") -- Remove all non-number characters
+	
+	-- addGlyphOptionElement( "width", nil, 1 )
+	-- addGlyphOptionElement( "height", nil, 1 )
+	-- addGlyphOptionElement( "advance", nil, 1 )
+	
+	-- local applyToAllButton = gui.gspot:button( "Apply to all", {10, y, 180, 20}, gui.elements.glyphOptionsList )
+	-- applyToAllButton.click = function()
+	-- 	print("Apply glyph options to all")
+	-- 	for _, glyph in ipairs(selectedLayer.glyphs) do
+	-- 		glyph:resize( selectedGlyph.width, selectedGlyph.height )
+	-- 		glyph.advance = selectedGlyph.advance
+	-- 	end
+	-- end
+	-- y = y+30
+	
+	local clearGlyphButton = gui.gspot:button( "Clear glyph", {10, y, 180, 20}, gui.elements.glyphOptionsList )
+	clearGlyphButton.click = function()
+		print("Clear glyph")
+		selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
+		selectedGlyph.images = {}
+		gui.updatePreviews()
 	end
 	y = y+30
+	
+	local componentsList = gui.gspot:group( "Components", {10, y, 180, 100}, gui.elements.glyphOptionsList )
+	componentsList.style.bg = {40, 40, 40, 255}
+	local component = gui.gspot:text( "acutecmb", {0, 20, 180, 20}, componentsList )
+	y = y+110
+	
+	gui.elements.glyphPreview = gui.gspot:image( nil, {10, y}, gui.elements.glyphOptionsList, selectedGlyph:getImage() )
+	gui.elements.glyphPreview2x = gui.gspot:image( nil, {10, y}, gui.elements.glyphOptionsList, selectedGlyph:getImage(2) )
+	gui.elements.glyphPreview4x = gui.gspot:image( nil, {10, y}, gui.elements.glyphOptionsList, selectedGlyph:getImage(4) )
 end
-
--- addGlyphOptionElement( "width", nil, 1 )
--- addGlyphOptionElement( "height", nil, 1 )
--- addGlyphOptionElement( "advance", nil, 1 )
-
--- local applyToAllButton = gui:button( "Apply to all", {10, y, 180, 20}, glyphOptionsList )
--- applyToAllButton.click = function()
--- 	print("Apply glyph options to all")
--- 	for _, glyph in ipairs(selectedLayer.glyphs) do
--- 		glyph:resize( selectedGlyph.width, selectedGlyph.height )
--- 		glyph.advance = selectedGlyph.advance
--- 	end
--- end
--- y = y+30
-
-local clearGlyphButton = gui:button( "Clear glyph", {10, y, 180, 20}, glyphOptionsList )
-clearGlyphButton.click = function()
-	print("Clear glyph")
-	selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
-	selectedGlyph.images = {}
-	updatePreviews()
-end
-y = y+30
-
-local glyphPreview = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage() )
-local glyphPreview2x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage(2) )
-local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:getImage(4) )
 
 
 
@@ -143,61 +157,63 @@ local glyphPreview4x = gui:image( nil, {10, y}, glyphOptionsList, selectedGlyph:
 
 -- GLYPHS (left)
 
-local glyphsList = gui:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
-glyphsList.scrollv.style.hs = "auto"
-glyphsList:setfont(24)
-local glyphButtons = {}
-local glyphImages = {}
-local combiningGlyphButtons = {}
-
-local y = 0
-for _, glyph in ipairs(selectedLayer.glyphs) do
-	if glyph.char then
-		local glyphButton = gui:button(glyph.char, {0, y*50, 50, 50}, glyphsList )
-		glyphButton.click = function(self)
-			if not fnt then return end
-			print("Selected glyph "..glyph.name)
-			selectedGlyph = glyph
-			
-			-- Reset colours of other elements
-			for _, btn in ipairs(glyphButtons) do
-				btn.style.hilite = gui.style.hilite
-				btn.style.focus = gui.style.focus
-				btn.style.fg = gui.style.fg
-			end
-			for _, btn in ipairs(combiningGlyphButtons) do
-				btn.style.hilite = gui.style.hilite
-				btn.style.focus = gui.style.focus
-				btn.style.fg = gui.style.fg
-			end
-			
-			-- Set this element's colour
-			self.style.hilite = {255,255,255,255}
-			self.style.focus = {255,255,255,255}
-			self.style.fg = {0,0,0,255}
-			
-			-- Update glyph options
-			for _, option in ipairs(glyphOptionsList.children) do
-				if option.elementtype == "input" then
-					option.value = tostring( selectedGlyph[option.label] )
+function gui.glyphs(fnt)
+	gui.elements.glyphsList = gui.gspot:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
+	gui.elements.glyphsList.scrollv.style.hs = "auto"
+	gui.elements.glyphsList:setfont(24)
+	gui.elements.glyphButtons = {}
+	gui.elements.glyphImages = {}
+	gui.elements.combiningGlyphButtons = {}
+	
+	local y = 0
+	for _, glyph in ipairs(selectedLayer.glyphs) do
+		if glyph.char then
+			local glyphButton = gui.gspot:button(glyph.char, {0, y*50, 50, 50}, gui.elements.glyphsList )
+			glyphButton.click = function(self)
+				if not fnt then return end
+				print("Selected glyph "..glyph.name)
+				selectedGlyph = glyph
+				
+				-- Reset colours of other elements
+				for _, btn in ipairs(gui.elements.glyphButtons) do
+					btn.style.hilite = gui.gspot.style.hilite
+					btn.style.focus = gui.gspot.style.focus
+					btn.style.fg = gui.gspot.style.fg
 				end
+				for _, btn in ipairs(gui.elements.combiningGlyphButtons) do
+					btn.style.hilite = gui.gspot.style.hilite
+					btn.style.focus = gui.gspot.style.focus
+					btn.style.fg = gui.gspot.style.fg
+				end
+				
+				-- Set this element's colour
+				self.style.hilite = {255,255,255,255}
+				self.style.focus = {255,255,255,255}
+				self.style.fg = {0,0,0,255}
+				
+				-- Update glyph options
+				for _, option in ipairs(gui.elements.glyphOptionsList.children) do
+					if option.elementtype == "input" then
+						option.value = tostring( selectedGlyph[option.label] )
+					end
+				end
+				gui.updatePreviews()
 			end
-			updatePreviews()
+			
+			-- Make sure selected glyph is selected visually, at load
+			if glyph == selectedGlyph then
+				glyphButton:click()
+			end
+			
+			local glyphCodepoint = gui.gspot:text( string.format("0x%X",glyph.unicode), {0, y*50+35, 50, 50}, gui.elements.glyphsList )
+			glyphCodepoint:setfont(10)
+			
+			local glyphImage = gui.gspot:image( nil, {60, y*50+5, 50, 50}, gui.elements.glyphsList )
+			table.insert( gui.elements.glyphButtons, glyphButton )
+			gui.elements.glyphImages[glyph] = glyphImage
+			
+			y = y+1
 		end
-		
-		-- Make sure selected glyph is selected visually, at load
-		if glyph == selectedGlyph then
-			glyphButton:click()
-		end
-		
-		local glyphCodepoint = gui:text( string.format("0x%X",glyph.unicode), {0, y*50+35, 50, 50}, glyphsList )
-		glyphCodepoint:setfont(10)
-		
-		local glyphImage = gui:image( nil, {60, y*50+5, 50, 50}, glyphsList )
-		table.insert( glyphButtons, glyphButton )
-		glyphImages[glyph] = glyphImage
-		
-		y = y+1
 	end
 end
 
@@ -207,78 +223,57 @@ end
 
 -- COMBINING GLYPHS LIST
 
-local combiningGlyphsList = gui:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
-combiningGlyphsList.scrollv.style.hs = "auto"
-combiningGlyphsList:setfont(12)
-
-y = 0
-for _, glyph in ipairs(selectedLayer.glyphs) do
-	if not glyph.char then
-		local glyphButton = gui:button(glyph.name, {0, y*50, 100, 50}, combiningGlyphsList )
-		glyphButton.click = function(self)
-			if not fnt then return end
-			print("Selected glyph "..glyph.name)
-			selectedGlyph = glyph
-			
-			-- Reset colours of other elements
-			for _, btn in ipairs(combiningGlyphButtons) do
-				btn.style.hilite = gui.style.hilite
-				btn.style.focus = gui.style.focus
-				btn.style.fg = gui.style.fg
-			end
-			for _, btn in ipairs(glyphButtons) do
-				btn.style.hilite = gui.style.hilite
-				btn.style.focus = gui.style.focus
-				btn.style.fg = gui.style.fg
-			end
-			
-			-- Set this element's colour
-			self.style.hilite = {255,255,255,255}
-			self.style.focus = {255,255,255,255}
-			self.style.fg = {0,0,0,255}
-			
-			-- Update glyph options
-			for _, option in ipairs(glyphOptionsList.children) do
-				if option.elementtype == "input" then
-					option.value = tostring( selectedGlyph[option.label] )
-				end
-			end
-			updatePreviews()
-		end
-		
-		-- Make sure selected glyph is selected visually, at load
-		if glyph == selectedGlyph then
-			glyphButton:click()
-		end
-		
-		table.insert( combiningGlyphButtons, glyphButton )
-		
-		y = y+1
-	end
-end
-combiningGlyphsList:hide()
-
-function updatePreviews(all)
-	glyphPreview:setimage( selectedGlyph:getImage() )
-	glyphPreview2x:setimage( selectedGlyph:getImage(2) )
-	glyphPreview2x.pos.x = 20 + selectedGlyph.width
-	glyphPreview4x:setimage( selectedGlyph:getImage(4) )
-	glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
+function gui.combiningGlyphsList(fnt)
+	gui.elements.combiningGlyphsList = gui.gspot:scrollgroup( nil, {0, 50, glyphListWidth, love.graphics.getHeight()-50}, nil, "vertical" )
+	gui.elements.combiningGlyphsList.scrollv.style.hs = "auto"
+	gui.elements.combiningGlyphsList:setfont(12)
 	
-	local maxScale = math.huge
+	y = 0
 	for _, glyph in ipairs(selectedLayer.glyphs) do
-		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
-	end
-
-	if all then
-		for glyph, image in pairs(glyphImages) do
-			image:setimage( glyph:getImage(math.floor(maxScale)) )
+		if not glyph.char then
+			local glyphButton = gui.gspot:button(glyph.name, {0, y*50, 100, 50}, gui.elements.combiningGlyphsList )
+			glyphButton.click = function(self)
+				if not fnt then return end
+				print("Selected glyph "..glyph.name)
+				selectedGlyph = glyph
+				
+				-- Reset colours of other elements
+				for _, btn in ipairs(gui.elements.combiningGlyphButtons) do
+					btn.style.hilite = gui.gspot.style.hilite
+					btn.style.focus = gui.gspot.style.focus
+					btn.style.fg = gui.gspot.style.fg
+				end
+				for _, btn in ipairs(gui.elements.glyphButtons) do
+					btn.style.hilite = gui.gspot.style.hilite
+					btn.style.focus = gui.gspot.style.focus
+					btn.style.fg = gui.gspot.style.fg
+				end
+				
+				-- Set this element's colour
+				self.style.hilite = {255,255,255,255}
+				self.style.focus = {255,255,255,255}
+				self.style.fg = {0,0,0,255}
+				
+				-- Update glyph options
+				for _, option in ipairs(gui.elements.glyphOptionsList.children) do
+					if option.elementtype == "input" then
+						option.value = tostring( selectedGlyph[option.label] )
+					end
+				end
+				gui.updatePreviews()
+			end
+			
+			-- Make sure selected glyph is selected visually, at load
+			if glyph == selectedGlyph then
+				glyphButton:click()
+			end
+			
+			table.insert( gui.elements.combiningGlyphButtons, glyphButton )
+			
+			y = y+1
 		end
-	else
-		if selectedGlyph.char then
-			glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
-		end
 	end
+	gui.elements.combiningGlyphsList:hide()
 end
 
 
@@ -287,20 +282,64 @@ end
 
 -- GLYPH NORMAL/COMBINING SELECTOR
 
-local glyphTypeSelector = gui:button( "Normal", {0, 0, glyphListWidth+16, 50} )
-glyphTypeSelector:setfont(12)
+function gui.combiningSelector(fnt)
+	gui.elements.glyphTypeSelector = gui.gspot:button( "Normal", {0, 0, glyphListWidth+16, 50} )
+	gui.elements.glyphTypeSelector:setfont(12)
+	
+	gui.elements.glyphTypeSelector.click = function(self)
+		if self.label == "Combining" then
+			self.label = "Normal"
+			gui.elements.combiningGlyphsList:hide()
+			gui.elements.glyphsList:show()
+			print("Selected normal glyphs")
+		else
+			self.label = "Combining"
+			gui.elements.glyphsList:hide()
+			gui.elements.combiningGlyphsList:show()
+			print("Selected combining glyphs")
+		end
+	end
+end
 
-glyphTypeSelector.click = function(self)
-	if self.label == "Combining" then
-		self.label = "Normal"
-		combiningGlyphsList:hide()
-		glyphsList:show()
-		print("Selected normal glyphs")
+
+
+
+
+-- CREATE GUI
+
+gui.actions(fnt)
+gui.fontOptions(fnt)
+gui.glyphOptions(fnt)
+gui.glyphs(fnt)
+gui.combiningGlyphsList(fnt)
+gui.combiningSelector(fnt)
+
+
+
+
+
+-- FUNCTIONS
+
+function gui.updatePreviews(all)
+	gui.elements.glyphPreview:setimage( selectedGlyph:getImage() )
+	gui.elements.glyphPreview2x:setimage( selectedGlyph:getImage(2) )
+	gui.elements.glyphPreview2x.pos.x = 20 + selectedGlyph.width
+	gui.elements.glyphPreview4x:setimage( selectedGlyph:getImage(4) )
+	gui.elements.glyphPreview4x.pos.x = 30 + selectedGlyph.width*3
+	
+	local maxScale = math.huge
+	for _, glyph in ipairs(selectedLayer.glyphs) do
+		maxScale = math.min( maxScale, 30/glyph.width, 40/glyph.height )
+	end
+	
+	if all then
+		for glyph, image in pairs(gui.elements.glyphImages) do
+			image:setimage( glyph:getImage(math.floor(maxScale)) )
+		end
 	else
-		self.label = "Combining"
-		glyphsList:hide()
-		combiningGlyphsList:show()
-		print("Selected combining glyphs")
+		if selectedGlyph.char then
+			gui.elements.glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+		end
 	end
 end
 

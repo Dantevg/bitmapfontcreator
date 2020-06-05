@@ -73,7 +73,7 @@ end
 
 function love.update(dt)
 	require("lib/lovebird").update()
-	gui:update(dt)
+	gui.gspot:update(dt)
 	
 	-- Update title to match font name
 	love.window.setTitle( "Bitmapfontcreator - "..fnt.family )
@@ -125,7 +125,7 @@ function love.draw()
 		x = x+glyph.advance*2
 	end
 	
-	gui:draw()
+	gui.gspot:draw()
 end
 
 -- Convert screen coordinates to canvas coordinates
@@ -160,15 +160,15 @@ end
 
 -- Forward love2d events to Gspot GUI
 function love.keypressed(key)
-	gui:keypress(key)
+	gui.gspot:keypress(key)
 end
 
 function love.textinput(key)
-	gui:textinput(key)
+	gui.gspot:textinput(key)
 end
 
 function love.mousepressed( x, y, btn )
-	gui:mousepress( x, y, btn )
+	gui.gspot:mousepress( x, y, btn )
 	
 	local _, _, inside = toCanvasCoords( x, y )
 	setCursor( x, y, inside )
@@ -180,13 +180,13 @@ function love.mousepressed( x, y, btn )
 		else -- Draw and update previews
 			x, y = toGlyphCoords( x, y )
 			selectedGlyph:setPixel( x, y, btn==1 )
-			updatePreviews()
+			gui.updatePreviews()
 		end
 	end
 end
 
 function love.mousereleased( x, y, btn )
-	gui:mouserelease( x, y, btn )
+	gui.gspot:mouserelease( x, y, btn )
 	
 	drawingCanvas = false
 	draggingAdvanceLine = false
@@ -194,7 +194,7 @@ function love.mousereleased( x, y, btn )
 end
 
 function love.wheelmoved( x, y )
-	gui:mousewheel( x, y )
+	gui.gspot:mousewheel( x, y )
 	
 	-- Zoom if mouse isn't over GUI
 	if love.mouse.getX() > canvasPos.x() and love.mouse.getX() < canvasPos.x2()
@@ -217,10 +217,10 @@ function love.mousemoved( x, y, dx, dy )
 			glyphPos._y = glyphPos._y + dy
 		elseif love.mouse.isDown(1) then
 			selectedGlyph:setPixel( x, y, true )
-			updatePreviews()
+			gui.updatePreviews()
 		elseif love.mouse.isDown(2) then
 			selectedGlyph:setPixel( x, y, false )
-			updatePreviews()
+			gui.updatePreviews()
 		end
 	end
 end
@@ -228,7 +228,7 @@ end
 function love.resize()
 	package.loaded.ui = nil -- "unload" ui
 	gui = require "ui" -- reload ui
-	updatePreviews(true)
+	gui.updatePreviews(true)
 end
 
 function love.directorydropped(path)
@@ -240,5 +240,5 @@ function love.directorydropped(path)
 	
 	package.loaded.ui = nil -- "unload" ui
 	gui = require "ui" -- reload ui
-	updatePreviews(true)
+	gui.updatePreviews(true)
 end

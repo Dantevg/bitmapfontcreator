@@ -88,7 +88,7 @@ function glyph:setPixel( x, y, value )
 	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	self:autoresize()
 	
-	self.images = {} -- To regenerate the image for drawing
+	self:regenerateImages() -- To regenerate the image for drawing
 end
 
 -- Save glyph as png to proper location
@@ -96,25 +96,39 @@ function glyph:saveImage(path)
 	self.imageData:encode( "png", path.."/"..ufo.convertToFilename(self.name)..".png" )
 end
 
+-- Remove cached images to signal regeneration when needed
+function glyph:regenerateImages()
+	self.images = {}
+	self.image = nil
+end
+
+-- Returns a clean version of the glyph (without component glyphs)
+function glyph:getCleanImage()
+	if not self.image then
+		self.image = love.graphics.newImage(self.imageData)
+	end
+	return self.image
+end
+
 -- Updates the (possibly scaled up) image if necessary, and returns it
-function glyph:getImage( scale, clean )
+function glyph:getImage(scale)
 	scale = scale or 1
 	
 	if not self.images[scale] and scale == 1 then
 		local canvas = love.graphics.newCanvas( self.width, self.height )
 		canvas:renderTo(function()
 			love.graphics.draw( love.graphics.newImage(self.imageData) )
-			if not clean then
-				for _, component in ipairs(self.components) do
-					love.graphics.draw( component.glyph:getImage(), component.x or 0, component.y or 0 )
-				end
+			for _, component in ipairs(self.components) do
+				love.graphics.setColor( component.colour )
+				love.graphics.draw( component.glyph:getImage(), component.x or 0, component.y or 0 )
 			end
+			love.graphics.setColor( 1, 1, 1 )
 		end)
 		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	elseif not self.images[scale] then
 		local canvas = love.graphics.newCanvas( self.width*scale, self.height*scale )
 		canvas:renderTo(function()
-			love.graphics.draw( self:getImage( nil, clean ), 0, self.height*scale, 0, scale, -scale )
+			love.graphics.draw( self:getImage(), 0, self.height*scale, 0, scale, -scale )
 		end)
 		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	end
@@ -131,26 +145,34 @@ function glyph:resize( width, height )
 	self.width, self.height = width, height
 	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
 	canvas:renderTo(function()
-		love.graphics.draw( self:getImage( nil, true ) )
+		love.graphics.draw( self:getCleanImage() )
 	end)
 	self.imageData = canvas:newImageData()
-	self.images = {}
+	self:regenerateImages()
 end
 
 -- Resize glyph to fit contents
 function glyph:autoresize( x, y )
 	local maxX, maxY = x or 0, y or 0
-	self.imageData:mapPixel(function( x, y, v, ... )
-		if v == 1 then
+	self.imageData:mapPixel(function( x, y, r, g, b, ... )
+		if r ~= 0 and g ~= 0 and b ~= 0 then
 			maxX, maxY = math.max( maxX, x ), math.max( maxY, y )
 		end
-		return v, ...
+		return r, g, b, ...
 	end)
 	for _, component in ipairs(self.components) do
 		maxX = math.max( maxX, component.x + component.glyph.width )
 		maxY = math.max( maxY, component.y + component.glyph.height )
 	end
 	self:resize( maxX+1, maxY+1 )
+end
+
+local function randomColour()
+	return {
+		0.5 + math.random(10)/20,
+		0.5 + math.random(10)/20,
+		0.5 + math.random(10)/20,
+	}
 end
 
 function glyph:addComponent( glyph, x, y )
@@ -162,7 +184,7 @@ function glyph:addComponent( glyph, x, y )
 		end
 	end
 	table.insert( glyph.isComponentOf, self )
-	table.insert( self.components, {glyph = glyph, x = x, y = y} )
+	table.insert( self.components, {glyph = glyph, x = x, y = y, colour = randomColour()} )
 	print("[INFO] Added component glyph "..glyph.name.." to "..self.name)
 	return true
 end

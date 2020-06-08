@@ -110,7 +110,7 @@ function gui.glyphComponents(y)
 		xInput.done = function(self)
 			print("[INFO] Set component "..component.glyph.name.." x offset to "..self.value)
 			component.x = self.value
-			selectedGlyph.images = {}
+			selectedGlyph:regenerateImages()
 			selectedGlyph:autoresize()
 			gui.updatePreviews()
 			self.Gspot[self.elementtype].done(self)
@@ -120,7 +120,7 @@ function gui.glyphComponents(y)
 		yInput.done = function(self)
 			print("[INFO] Set component "..component.glyph.name.." y offset to "..self.value)
 			component.y = self.value
-			selectedGlyph.images = {}
+			selectedGlyph:regenerateImages()
 			selectedGlyph:autoresize()
 			gui.updatePreviews()
 			self.Gspot[self.elementtype].done(self)
@@ -179,7 +179,7 @@ function gui.glyphOptions(fnt)
 	clearGlyphButton.click = function()
 		print("[INFO] Clear glyph")
 		selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
-		selectedGlyph.images = {}
+		selectedGlyph:regenerateImages()
 		selectedGlyph:autoresize()
 		gui.updatePreviews()
 	end
@@ -249,7 +249,7 @@ function gui.glyphs(fnt)
 				end
 				gui.gspot:rem(gui.elements.glyphComponentsList)
 				gui.glyphComponents()
-				glyph.images = {}
+				glyph:regenerateImages()
 				glyph:autoresize()
 				gui.updatePreviews()
 			end
@@ -327,7 +327,7 @@ function gui.combiningGlyphs(fnt)
 				end
 				gui.gspot:rem(gui.elements.glyphComponentsList)
 				gui.glyphComponents()
-				glyph.images = {}
+				glyph:regenerateImages()
 				glyph:autoresize()
 				gui.updatePreviews()
 			end

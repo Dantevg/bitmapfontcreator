@@ -216,6 +216,9 @@ function gui.glyphs(fnt)
 				if gui.addingComponent then
 					gui.addingComponent = false
 					selectedGlyph:addComponent( glyph, 0, 0 )
+					selectedGlyph:regenerateImages()
+					selectedGlyph:autoresize()
+					gui.updatePreviews()
 					gui.gspot:rem(gui.elements.glyphComponentsList)
 					gui.glyphComponents()
 					return
@@ -294,6 +297,9 @@ function gui.combiningGlyphs(fnt)
 				if gui.addingComponent then
 					gui.addingComponent = false
 					selectedGlyph:addComponent( glyph, 0, 0 )
+					selectedGlyph:regenerateImages()
+					selectedGlyph:autoresize()
+					gui.updatePreviews()
 					gui.gspot:rem(gui.elements.glyphComponentsList)
 					gui.glyphComponents()
 					return

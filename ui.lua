@@ -111,6 +111,7 @@ function gui.glyphComponents(y)
 			print("[INFO] Set component "..component.glyph.name.." x offset to "..self.value)
 			component.x = self.value
 			selectedGlyph.images = {}
+			selectedGlyph:autoresize()
 			gui.updatePreviews()
 			self.Gspot[self.elementtype].done(self)
 		end
@@ -120,6 +121,7 @@ function gui.glyphComponents(y)
 			print("[INFO] Set component "..component.glyph.name.." y offset to "..self.value)
 			component.y = self.value
 			selectedGlyph.images = {}
+			selectedGlyph:autoresize()
 			gui.updatePreviews()
 			self.Gspot[self.elementtype].done(self)
 		end
@@ -178,6 +180,7 @@ function gui.glyphOptions(fnt)
 		print("[INFO] Clear glyph")
 		selectedGlyph.imageData:mapPixel(function() return 0, 0, 0, 0 end)
 		selectedGlyph.images = {}
+		selectedGlyph:autoresize()
 		gui.updatePreviews()
 	end
 	y = y+30
@@ -247,6 +250,7 @@ function gui.glyphs(fnt)
 				gui.gspot:rem(gui.elements.glyphComponentsList)
 				gui.glyphComponents()
 				glyph.images = {}
+				glyph:autoresize()
 				gui.updatePreviews()
 			end
 			
@@ -324,6 +328,7 @@ function gui.combiningGlyphs(fnt)
 				gui.gspot:rem(gui.elements.glyphComponentsList)
 				gui.glyphComponents()
 				glyph.images = {}
+				glyph:autoresize()
 				gui.updatePreviews()
 			end
 			
@@ -394,7 +399,7 @@ function gui.updatePreviews(all)
 		end
 	else
 		if selectedGlyph.char then
-			gui.elements.glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage(math.floor(maxScale)) )
+			gui.elements.glyphImages[selectedGlyph]:setimage( selectedGlyph:getImage( math.floor(maxScale) ) )
 		end
 	end
 end

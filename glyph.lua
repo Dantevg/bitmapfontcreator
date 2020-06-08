@@ -69,10 +69,10 @@ function glyph:getContours(scale)
 		if v == 1 then
 			table.insert( contours, {
 				name = "contour",
-				{ name = "point", attr = {x = x*scale,     y = y*scale,     type="line"} },
-				{ name = "point", attr = {x = (x+1)*scale, y = y*scale,     type="line"} },
-				{ name = "point", attr = {x = (x+1)*scale, y = (y+1)*scale, type="line"} },
-				{ name = "point", attr = {x = x*scale,     y = (y+1)*scale, type="line"} },
+				{ name = "point", attr = {x = (x+self.xOffset)*scale,   y = (y+self.yOffset)*scale,   type="line"} },
+				{ name = "point", attr = {x = (x+self.xOffset+1)*scale, y = (y+self.yOffset)*scale,   type="line"} },
+				{ name = "point", attr = {x = (x+self.xOffset+1)*scale, y = (y+self.yOffset+1)*scale, type="line"} },
+				{ name = "point", attr = {x = (x+self.xOffset)*scale,   y = (y+self.yOffset+1)*scale, type="line"} },
 			} )
 		end
 		

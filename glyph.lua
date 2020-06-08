@@ -65,6 +65,7 @@ end
 function glyph:getContours(scale)
 	local contours = {}
 	
+	-- Insert contours of own individual pixels
 	self.imageData:mapPixel(function( x, y, v, ... )
 		if v == 1 then
 			table.insert( contours, {
@@ -78,6 +79,18 @@ function glyph:getContours(scale)
 		
 		return v, ... -- Return original colour, as ImageData:mapPixel expects it
 	end)
+	
+	-- Insert component glyphs
+	for _, component in ipairs(self.components) do
+		table.insert( contours, {
+			name = "component",
+			attr = {
+				base = component.glyph.name,
+				xOffset = component.x*scale,
+				yOffset = component.y*scale,
+			}
+		} )
+	end
 	
 	return contours
 end

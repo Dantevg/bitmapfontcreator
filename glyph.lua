@@ -158,7 +158,6 @@ function glyph:resize( x, y, width, height )
 	width, height = width or self.width, height or self.height
 	x, y = x or 0, y or 0
 	if width == self.width and height == self.height and x == 0 and y == 0 then return end
-	print("[INFO] Resized glyph "..self.name.." to "..width..", "..height.." with offset "..x..", "..y)
 	
 	local canvas = love.graphics.newCanvas( width, height )
 	canvas:renderTo(function()
@@ -168,6 +167,8 @@ function glyph:resize( x, y, width, height )
 	self.xOffset, self.yOffset = x, y
 	self.imageData = canvas:newImageData()
 	self:regenerateImages()
+	
+	print("[INFO] Resized glyph "..self.name.." to "..self.width..", "..self.height.." with offset "..self.xOffset..", "..self.yOffset)
 end
 
 -- Resize glyph to fit contents

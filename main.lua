@@ -85,7 +85,10 @@ function love.draw()
 	
 	-- Draw glyph
 	love.graphics.setColor( 1, 1, 1 )
-	love.graphics.draw( selectedGlyph:getImage(), glyphPos.x(), glyphPos.y(), 0, scaleRound, -scaleRound )
+	love.graphics.draw( selectedGlyph:getImage(),
+		glyphPos.x()+selectedGlyph.xOffset*scaleRound,
+		glyphPos.y()-selectedGlyph.yOffset*scaleRound,
+		0, scaleRound, -scaleRound )
 	
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then

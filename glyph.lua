@@ -28,6 +28,8 @@ function glyph.new(options)
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
+		xOffset = 0,
+		yOffset = 0,
 		components = {},
 		isComponentOf = {},
 		imageData = imageData,
@@ -49,6 +51,8 @@ function glyph.newCombining(options)
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
 		advance = options.advance or (options.width or imageData:getWidth())+1,
+		xOffset = 0,
+		yOffset = 0,
 		components = {},
 		isComponentOf = {},
 		imageData = imageData,
@@ -82,10 +86,11 @@ end
 function glyph:setPixel( x, y, value )
 	x, y = math.floor(x), math.floor(y)
 	if not value and (x >= self.width or y >= self.height) then return end
-	if x < 0 or y < 0 then return end
+	-- if x < 0 or y < 0 then return end
 	
 	self:autoresize( x, y ) -- Auto resize if pixel was out of range
-	self.imageData:setPixel( x, y, unpack(value and {1,1,1,1} or {0,0,0,0}) )
+	print("[LOG]  Setting pixel at "..x..", "..y.." to "..tostring(value).." ("..(x-self.xOffset)..", "..(y-self.yOffset).." in image)")
+	self.imageData:setPixel( x-self.xOffset, y-self.yOffset, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	self:autoresize()
 	
 	self:regenerateImages() -- To regenerate the image for drawing
@@ -137,34 +142,40 @@ function glyph:getImage(scale)
 end
 
 -- Resizes the glyph without losing the contents
-function glyph:resize( width, height )
+function glyph:resize( x, y, width, height )
 	width, height = width or self.width, height or self.height
-	if width == self.width and height == self.height then return end
-	print("[INFO] Resized glyph "..self.name.." to "..width..", "..height)
+	x, y = x or 0, y or 0
+	if width == self.width and height == self.height and x == 0 and y == 0 then return end
+	print("[INFO] Resized glyph "..self.name.." to "..width..", "..height.." with offset "..x..", "..y)
 	
-	self.width, self.height = width, height
-	local canvas = love.graphics.newCanvas( width or self.width, height or self.height )
+	local canvas = love.graphics.newCanvas( width, height )
 	canvas:renderTo(function()
-		love.graphics.draw( self:getCleanImage() )
+		love.graphics.draw( self:getCleanImage(), self.xOffset-x, self.yOffset-y )
 	end)
+	self.width, self.height = width, height
+	self.xOffset, self.yOffset = x, y
 	self.imageData = canvas:newImageData()
 	self:regenerateImages()
 end
 
 -- Resize glyph to fit contents
 function glyph:autoresize( x, y )
+	local minX, minY = x or 0, y or 0
 	local maxX, maxY = x or 0, y or 0
 	self.imageData:mapPixel(function( x, y, r, g, b, ... )
 		if r ~= 0 and g ~= 0 and b ~= 0 then
-			maxX, maxY = math.max( maxX, x ), math.max( maxY, y )
+			minX, minY = math.min( minX, x+self.xOffset ), math.min( minY, y+self.yOffset )
+			maxX, maxY = math.max( maxX, x+self.xOffset ), math.max( maxY, y+self.yOffset )
 		end
 		return r, g, b, ...
 	end)
 	for _, component in ipairs(self.components) do
+		minX = math.min( minX, component.x )
+		minY = math.min( minY, component.y )
 		maxX = math.max( maxX, component.x + component.glyph.width )
 		maxY = math.max( maxY, component.y + component.glyph.height )
 	end
-	self:resize( maxX+1, maxY+1 )
+	self:resize( minX, minY, maxX-minX+1, maxY-minY+1 )
 end
 
 local function randomColour()

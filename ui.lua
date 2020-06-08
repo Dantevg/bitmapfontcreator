@@ -100,9 +100,7 @@ function gui.glyphComponents(y)
 	gui.elements.glyphComponentsList.style.bg = {40, 40, 40, 255}
 	local addComponentButton = gui.gspot:button( "Add", {0, 0, 40, 20}, gui.elements.glyphComponentsList )
 	addComponentButton.click = function(self)
-		selectedGlyph:addComponent( selectedLayer.glyphs[math.random(1,128)], 0, 0 ) -- TODO: remove random
-		gui.gspot:rem(gui.elements.glyphComponentsList)
-		gui.glyphComponents()
+		gui.addingComponent = true
 	end
 	
 	for i, component in ipairs(selectedGlyph.components) do
@@ -212,6 +210,14 @@ function gui.glyphs(fnt)
 			local glyphButton = gui.gspot:button(glyph.char, {0, y*50, 50, 50}, gui.elements.glyphsList )
 			glyphButton.click = function(self)
 				if not fnt then return end
+				if gui.addingComponent then
+					gui.addingComponent = false
+					selectedGlyph:addComponent( glyph, 0, 0 )
+					gui.gspot:rem(gui.elements.glyphComponentsList)
+					gui.glyphComponents()
+					return
+				end
+				
 				print("[LOG]  Selected glyph "..glyph.name)
 				selectedGlyph = glyph
 				
@@ -281,6 +287,14 @@ function gui.combiningGlyphs(fnt)
 			local glyphButton = gui.gspot:button(glyph.name, {0, y*50, 100, 50}, gui.elements.combiningGlyphsList )
 			glyphButton.click = function(self)
 				if not fnt then return end
+				if gui.addingComponent then
+					gui.addingComponent = false
+					selectedGlyph:addComponent( glyph, 0, 0 )
+					gui.gspot:rem(gui.elements.glyphComponentsList)
+					gui.glyphComponents()
+					return
+				end
+				
 				print("[LOG]  Selected glyph "..glyph.name)
 				selectedGlyph = glyph
 				

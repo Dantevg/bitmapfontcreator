@@ -102,7 +102,6 @@ function glyph:setPixel( x, y, value )
 	-- if x < 0 or y < 0 then return end
 	
 	self:autoresize( x, y ) -- Auto resize if pixel was out of range
-	print("[LOG]  Setting pixel at "..x..", "..y.." to "..tostring(value).." ("..(x-self.xOffset)..", "..(y-self.yOffset).." in image)")
 	self.imageData:setPixel( x-self.xOffset, y-self.yOffset, unpack(value and {1,1,1,1} or {0,0,0,0}) )
 	self:autoresize()
 	

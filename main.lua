@@ -133,7 +133,7 @@ function love.draw()
 	
 	if gui.addingComponent then
 		love.graphics.setColor( 0, 0, 0, 0.8 )
-		love.graphics.rectangle( "fill", glyphListWidth, 0, love.graphics.getWidth()-glyphListWidth, love.graphics.getHeight() )
+		love.graphics.rectangle( "fill", canvasPos.x(), 0, love.graphics.getWidth()-canvasPos.x(), love.graphics.getHeight() )
 		love.graphics.setColor( 1, 1, 1 )
 	end
 end
@@ -178,7 +178,7 @@ function love.textinput(key)
 end
 
 function love.mousepressed( x, y, btn )
-	if gui.addingComponent and x > glyphListWidth then return end
+	if gui.addingComponent and x > canvasPos.x() then return end
 	gui.gspot:mousepress( x, y, btn )
 	
 	local _, _, inside = toCanvasCoords( x, y )

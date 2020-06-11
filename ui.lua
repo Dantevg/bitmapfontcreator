@@ -43,7 +43,7 @@ function gui.actions(fnt)
 			fnt:save()
 			io.write("Done.\n")
 		end
-		local command = "fontmake -u "..path..".ufo --output-path "..path..".ttf"
+		local command = "fontmake -u '"..path..".ufo' --output-path '"..path..".ttf'"
 		print("Executing "..command..":\n")
 		os.execute(command)
 		print("\nDone.")

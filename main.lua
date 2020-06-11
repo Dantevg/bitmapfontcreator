@@ -55,7 +55,7 @@ function love.load()
 	love.graphics.setDefaultFilter( "nearest", "nearest" ) -- Prevent blurry glyph scaling
 	
 	-- Load default font
-	fnt = font({family = "test"})
+	fnt = font({family = "font"})
 	fnt.author = "nl.dantevg"
 	
 	-- Select default characters
@@ -87,8 +87,8 @@ function love.draw()
 	love.graphics.setColor( 1, 1, 1 )
 	love.graphics.draw( selectedGlyph:getImage(),
 		glyphPos.x()+selectedGlyph.xOffset*scaleRound,
-		glyphPos.y()-selectedGlyph.yOffset*scaleRound,
-		0, scaleRound, -scaleRound )
+		glyphPos.y()-(selectedGlyph.yOffset+selectedGlyph.height)*scaleRound,
+		0, scaleRound, scaleRound )
 	
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then
@@ -125,7 +125,7 @@ function love.draw()
 	local x = canvasPos.x()+5
 	for i = 1, #sentence do
 		local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
-		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-55, 0, 2, -2 )
+		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-55-glyph.height*2, 0, 2, 2 )
 		x = x+glyph.advance*2
 	end
 	

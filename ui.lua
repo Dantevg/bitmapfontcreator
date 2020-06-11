@@ -25,13 +25,8 @@ function gui.actions(fnt)
 		love.graphics.getWidth()-200-glyphListWidth-16, 50
 	} )
 	gui.elements.actionsList:setfont(12)
-	local loadFontButton = gui.gspot:button( "Load", {0, 0, 100, 50}, gui.elements.actionsList )
-	local saveFontButton = gui.gspot:button( "Save", {110, 0, 100, 50}, gui.elements.actionsList )
-	local compileFontButton = gui.gspot:button( "Compile", {220, 0, 100, 50}, gui.elements.actionsList )
-	
-	loadFontButton.click = function(self)
-		print("Load font")
-	end
+	local saveFontButton = gui.gspot:button( "Save", {0, 0, 100, 50}, gui.elements.actionsList )
+	local compileFontButton = gui.gspot:button( "Compile", {110, 0, 100, 50}, gui.elements.actionsList )
 	
 	saveFontButton.click = function(self)
 		io.write("Saving font... ")

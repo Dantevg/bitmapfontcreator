@@ -131,21 +131,17 @@ end
 function glyph:getImage(scale)
 	scale = scale or 1
 	
-	if not self.images[scale] and scale == 1 then
-		local canvas = love.graphics.newCanvas( self.width, self.height )
-		canvas:renderTo(function()
-			love.graphics.draw( love.graphics.newImage(self.imageData) )
-			for _, component in ipairs(self.components) do
-				love.graphics.setColor( component.colour )
-				love.graphics.draw( component.glyph:getImage(), component.x or 0, component.y or 0 )
-			end
-			love.graphics.setColor( 1, 1, 1 )
-		end)
-		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
-	elseif not self.images[scale] then
+	if not self.images[scale] then
 		local canvas = love.graphics.newCanvas( self.width*scale, self.height*scale )
 		canvas:renderTo(function()
-			love.graphics.draw( self:getImage(), 0, self.height*scale, 0, scale, -scale )
+			love.graphics.draw( self:getCleanImage(), 0, self.height*scale, 0, scale, -scale )
+			for _, component in ipairs(self.components) do
+				love.graphics.setColor( component.colour )
+				local x = component.x and component.x*scale or 0
+				local y = component.y and (self.height - component.y - component.glyph.height)*scale or 0
+				love.graphics.draw( component.glyph:getImage(), x, y, 0, scale, scale )
+			end
+			love.graphics.setColor( 1, 1, 1 )
 		end)
 		self.images[scale] = love.graphics.newImage( canvas:newImageData() )
 	end

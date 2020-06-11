@@ -34,8 +34,8 @@ function font.new(options)
 		table.insert( fnt.layers[1].glyphs, glyph{
 			char = utf8.char(code),
 			unicode = code,
-			width = 5,                -- Default empty width
-			height = fnt.height or 7, -- Default empty height
+			width = 1,                -- Default empty width
+			height = fnt.height or 1, -- Default empty height
 			advance = 6,              -- Default empty advance
 		} )
 	end
@@ -43,8 +43,8 @@ function font.new(options)
 	local function addCombiningGlyph(name)
 		table.insert( fnt.layers[1].glyphs, glyph.newCombining{
 			name = name,
-			width = 5,                -- Default empty width
-			height = fnt.height or 7, -- Default empty height
+			width = 1,                -- Default empty width
+			height = fnt.height or 1, -- Default empty height
 			advance = 6,              -- Default empty advance
 		} )
 	end

@@ -51,7 +51,7 @@ function round(val) -- Round X.5 towards positive infinity
 	return val + 0.5 - (val+0.5) % 1 -- equal to math.floor(val+0.5), but faster
 end
 
-function love.load()
+function love.load(args)
 	love.graphics.setDefaultFilter( "nearest", "nearest" ) -- Prevent blurry glyph scaling
 	
 	-- Load default font
@@ -69,7 +69,10 @@ function love.load()
 	
 	-- Build the GUI
 	gui = require "ui"
+	gui.fontmakePath = args[1] or "fontmake"
 	gui.load(fnt)
+	
+	fnt:autoCompoundGlyphs(selectedLayer)
 end
 
 function love.update(dt)

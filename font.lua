@@ -57,9 +57,17 @@ function font.new(options)
 	-- Pre-fill glyphs array with empty combining glyphs
 	addCombiningGlyph("acutecmb")
 	addCombiningGlyph("brevecmb")
-	addCombiningGlyph("tildecmb")
+	addCombiningGlyph("cedillacmb")
 	addCombiningGlyph("circumflexcmb")
+	addCombiningGlyph("dieresiscmb")
+	addCombiningGlyph("gravecmb")
 	addCombiningGlyph("ringcmb")
+	addCombiningGlyph("tildecmb")
+	
+	-- TODO: remove
+	for _, glyph in ipairs(fnt.layers[1].glyphs) do
+		print( glyph.name, glyph.char or "[combining]" )
+	end
 	
 	return setmetatable( fnt, {__index = font} )
 end
@@ -362,6 +370,132 @@ function font:getGlyph( layer, unicode )
 	for _, glyph in ipairs(layer.glyphs) do
 		if glyph.unicode == unicode then return glyph end
 	end
+end
+
+function font:getGlyphByName( layer, name )
+	for _, glyph in ipairs(layer.glyphs) do
+		if glyph.name == name then return glyph end
+	end
+end
+
+function font:autoCompoundGlyphs(layer)
+	local glyphs = {
+		A = self:getGlyph( layer, "A" ),
+		C = self:getGlyph( layer, "C" ),
+		E = self:getGlyph( layer, "E" ),
+		I = self:getGlyph( layer, "I" ),
+		N = self:getGlyph( layer, "N" ),
+		O = self:getGlyph( layer, "O" ),
+		U = self:getGlyph( layer, "U" ),
+		Y = self:getGlyph( layer, "Y" ),
+		
+		a = self:getGlyph( layer, "a" ),
+		c = self:getGlyph( layer, "c" ),
+		e = self:getGlyph( layer, "e" ),
+		i = self:getGlyph( layer, "i" ),
+		n = self:getGlyph( layer, "n" ),
+		o = self:getGlyph( layer, "o" ),
+		u = self:getGlyph( layer, "u" ),
+		y = self:getGlyph( layer, "y" ),
+		
+		acutecmb = self:getGlyphByName( layer, "acutecmb" ),
+		brevecmb = self:getGlyphByName( layer, "brevecmb" ),
+		cedillacmb = self:getGlyphByName( layer, "cedillacmb" ),
+		circumflexcmb = self:getGlyphByName( layer, "circumflexcmb" ),
+		dieresiscmb = self:getGlyphByName( layer, "dieresiscmb" ),
+		gravecmb = self:getGlyphByName( layer, "gravecmb" ),
+		ringcmb = self:getGlyphByName( layer, "ringcmb" ),
+		tildecmb = self:getGlyphByName( layer, "tildecmb" ),
+	}
+	
+	local function combine( base, ... )
+		local glyph = self:getGlyph( layer, base )
+		if not glyph then return end
+		for _, component in ipairs({...}) do
+			if component and component[1] then
+				glyph:addComponent( unpack(component) )
+			end
+		end
+	end
+	
+	local function autocombine( name, y )
+		combine( name:sub(1,1), { glyphs[name:sub(2)], 0, y or self.height or 0 } )
+	end
+	
+	-- Uppercase
+	autocombine("Agrave")
+	autocombine("Aacute")
+	autocombine("Acircumflex")
+	autocombine("Atilde")
+	autocombine("Adieresis")
+	autocombine("Aring")
+	
+	combine( "AE", {glyphs.A, 0, 0}, {glyphs.E, 5, 0} )
+	
+	combine( "Ccedilla", {glyphs.C, 0, 0}, {glyphs.cedillacmb, 0, -2} )
+	
+	autocombine("Egrave")
+	autocombine("Eacute")
+	autocombine("Ecircumflex")
+	autocombine("Edieresis")
+	
+	autocombine("Igrave")
+	autocombine("Iacute")
+	autocombine("Icircumflex")
+	autocombine("Idieresis")
+	
+	autocombine("Ntilde")
+	
+	autocombine("Ograve")
+	autocombine("Oacute")
+	autocombine("Ocircumflex")
+	autocombine("Otilde")
+	autocombine("Odieresis")
+	
+	autocombine("Ugrave")
+	autocombine("Uacute")
+	autocombine("Ucircumflex")
+	autocombine("Udieresis")
+	
+	autocombine("Yacute")
+	
+	-- Lowercase
+	autocombine("agrave")
+	autocombine("aacute")
+	autocombine("acircumflex")
+	autocombine("atilde")
+	autocombine("adieresis")
+	autocombine("aring")
+	
+	combine( "ae", {glyphs.a, 0, 0}, {glyphs.e, 4, 0} )
+	
+	combine( "ccedilla", {glyphs.C, 0, 0}, {glyphs.cedillacmb, 0, -2} )
+	
+	autocombine("egrave")
+	autocombine("eacute")
+	autocombine("ecircumflex")
+	autocombine("edieresis")
+	
+	autocombine("igrave")
+	autocombine("iacute")
+	autocombine("icircumflex")
+	autocombine("idieresis")
+	
+	autocombine("ntilde")
+	
+	autocombine("ograve")
+	autocombine("oacute")
+	autocombine("ocircumflex")
+	autocombine("otilde")
+	autocombine("odieresis")
+	
+	autocombine("ugrave")
+	autocombine("uacute")
+	autocombine("ucircumflex")
+	autocombine("udieresis")
+	
+	autocombine("yacute")
+	autocombine("ydieresis")
 end
 
 

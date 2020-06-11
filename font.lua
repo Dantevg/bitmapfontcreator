@@ -64,11 +64,6 @@ function font.new(options)
 	addCombiningGlyph("ringcmb")
 	addCombiningGlyph("tildecmb")
 	
-	-- TODO: remove
-	for _, glyph in ipairs(fnt.layers[1].glyphs) do
-		print( glyph.name, glyph.char or "[combining]" )
-	end
-	
 	return setmetatable( fnt, {__index = font} )
 end
 

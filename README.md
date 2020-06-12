@@ -1,6 +1,7 @@
 # Bitmap font creator
 
-Love2d application for creating pixel fonts.
+Bitmapfontcreator is a simple program for creating pixel fonts,
+built with the Love2D game framework.
 
 ![screenshot](Screenshots/Combining.png)
 
@@ -57,7 +58,7 @@ Platfom | Path
 --------|------
 Windows | `%appdata%\bitmapfontcreator\`
 MacOS   | `~/Library/Application Support/bitmapfontcreator/`
-Linux   | `~/.local/share/bitmapfontcreator/`
+Linux   | `~/.local/share/love/bitmapfontcreator`
 
 To load a font, navigate to the save directory and drag the `.ufo` directory
 onto the Bitmapfontcreator window.  

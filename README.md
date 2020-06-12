@@ -6,11 +6,10 @@ Love2d application for creating pixel fonts.
 
 ## Installation
 1. Install [fontmake]
-2. - Windows: Download Bitmapfontcreator `.zip` from the [releases tab],
-     extract it and run the `.exe`.
-   - MacOS: Download Bitmapfontcreator `.app` and run it.
-   - Linux: Install the [Love2D package], download Bitmapfontcreator `.love`
-     and run it with `love bitmapfontcreator.love`
+2. Download the file for your OS from the [releases tab]
+   - Windows: Extract it and run the `.exe`.
+   - MacOS: Extract it and run the `.app`.
+   - Linux: Install the [Love2D package], run it with `love bitmapfontcreator_linux.love`
 
 ## Usage manual
 On startup, Bitmapfontcreator will create a new font.

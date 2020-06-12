@@ -128,12 +128,15 @@ function love.draw()
 	local x = canvasPos.x()+5
 	for i = 1, #sentence do
 		local glyph = fnt:getGlyph( selectedLayer, require("utf8").codepoint(sentence,i,i) )
-		love.graphics.draw( glyph:getImage(), x, love.graphics.getHeight()-55-glyph.height*2, 0, 2, 2 )
+		local ox = glyph.xOffset*2
+		local oy = glyph.height*2 + glyph.yOffset*2
+		love.graphics.draw( glyph:getImage(), x+ox, love.graphics.getHeight()-55-oy, 0, 2, 2 )
 		x = x+glyph.advance*2
 	end
 	
 	gui.gspot:draw()
 	
+	-- Draw component choosing overlay
 	if gui.addingComponent then
 		love.graphics.setColor( 0, 0, 0, 0.8 )
 		love.graphics.rectangle( "fill", canvasPos.x(), 0, love.graphics.getWidth()-canvasPos.x(), love.graphics.getHeight() )

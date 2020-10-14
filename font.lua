@@ -357,6 +357,59 @@ function font:save(path)
 	return path
 end
 
+
+
+-- IMAGE OUTPUT
+
+function font:saveImage(path, width, height)
+	width, height = width or 128, height or 128
+	self:calculateHeight()
+	
+	local info = love.filesystem.getInfo(path or "")
+	if info and info.type == "directory" then
+		path = (path and path.."/"..self.family or self.family) -- Is a folder, place .png inside folder
+	end
+	
+	local img = love.image.newImageData(width, height)
+	local meta = string.format("return {\n\tfile=%q,\n\theight=%d,\n\tchars={\n",
+		path..".png", self.height)
+	local x, y = 0, 0
+	for _, glyph in ipairs(self.layers[1].glyphs) do
+		if glyph.char then -- Is a normal (non-combining) glyph
+			if x + glyph.width >= width then
+				x = 0
+				y = y + self.height + 1
+			end
+			
+			-- Insert metadata
+			meta = meta .. string.format("\t\t{char=%q,x=%d,y=%d,ox=%d,oy=%d,width=%d,height=%d,advance=%d},\n",
+				glyph.char, x, y, glyph.xOffset, glyph.yOffset, glyph.width, glyph.height, glyph.advance)
+			
+			-- Insert image
+			img:paste(glyph.imageData, x, y, 0, 0, glyph.width, glyph.height)
+			
+			x = x + glyph.width + 1
+		end
+	end
+	
+	-- Save
+	meta = meta .. "\t}\n}\n"
+	love.filesystem.write( path..".lua", meta )
+	img:encode( "png", path..".png" )
+end
+
+
+
+-- GLYPHS
+
+function font:calculateHeight()
+	self.height = 0
+	for _, glyph in ipairs(self.layers[1].glyphs) do
+		self.height = math.max( self.height, glyph.height )
+	end
+	return self.height
+end
+
 function font:getGlyph( layer, unicode )
 	if type(unicode) == "string" then
 		unicode = aglfn.getCodepoint(unicode)

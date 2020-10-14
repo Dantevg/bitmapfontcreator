@@ -27,6 +27,7 @@ function gui.actions(fnt)
 	gui.elements.actionsList:setfont(12)
 	local saveFontButton = gui.gspot:button( "Save", {0, 0, 100, 50}, gui.elements.actionsList )
 	local compileFontButton = gui.gspot:button( "Compile", {110, 0, 100, 50}, gui.elements.actionsList )
+	local saveImageButton = gui.gspot:button( "Save PNG", {220, 0, 100, 50}, gui.elements.actionsList )
 	
 	saveFontButton.click = function(self)
 		io.write("Saving font... ")
@@ -47,6 +48,12 @@ function gui.actions(fnt)
 		print("Executing "..command..":\n")
 		os.execute(command)
 		print("\nDone.")
+	end
+	
+	saveImageButton.click = function(self)
+		print("Saving PNG...")
+		fnt:saveImage()
+		print("Done.")
 	end
 end
 

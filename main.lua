@@ -96,10 +96,10 @@ function love.draw()
 	-- Draw pixel aligned lines
 	if scaleRound >= 5 then
 		love.graphics.setColor( 0.5, 0.5, 0.5, 0.1 )
-		for x = glyphPos.x(), canvasPos.x2(), scaleRound do
+		for x = canvasPos.x() + (glyphPos._x % scaleRound), canvasPos.x2(), scaleRound do
 			love.graphics.line( x, canvasPos.y(), x, canvasPos.y2() )
 		end
-		for y = glyphPos.y(), canvasPos.y(), -scaleRound do
+		for y = canvasPos.y() + (glyphPos._y % scaleRound), canvasPos.y2(), scaleRound do
 			love.graphics.line( canvasPos.x(), y, canvasPos.x2(), y )
 		end
 		

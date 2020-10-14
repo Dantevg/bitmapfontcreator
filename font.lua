@@ -371,8 +371,12 @@ function font:saveImage(path, width, height)
 	end
 	
 	local canvas = love.graphics.newCanvas( width, height )
-	local meta = string.format("return {\n\tfile=%q,\n\theight=%d,\n\tchars={\n",
+	local meta = string.format("return {\n\tfile=%q,\n\theight=%d,\n",
 		path..".png", self.height)
+	meta = meta .. string.format("\tdescription={\n\t\tfamily=%q,\n\t\tstyle=%q,\n\t},\n",
+		self.family, self.style)
+	meta = meta .. string.format("\ttexture={\n\t\tfile=%q,\n\t\twidth=%d,\n\t\theight=%d,\n\t}\n\tchars={\n",
+		path..".png", width, height)
 	local x, y = 0, 0
 	for _, glyph in ipairs(self.layers[1].glyphs) do
 		if glyph.char then -- Is a normal (non-combining) glyph
@@ -396,7 +400,7 @@ function font:saveImage(path, width, height)
 	
 	-- Save
 	meta = meta .. "\t}\n}\n"
-	love.filesystem.write( path..".lua", meta )
+	love.filesystem.write( path.."_meta.lua", meta )
 	canvas:newImageData():encode( "png", path..".png" )
 end
 

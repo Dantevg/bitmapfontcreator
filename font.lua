@@ -370,7 +370,7 @@ function font:saveImage(path, width, height)
 		path = (path and path.."/"..self.family or self.family) -- Is a folder, place .png inside folder
 	end
 	
-	local img = love.image.newImageData(width, height)
+	local canvas = love.graphics.newCanvas( width, height )
 	local meta = string.format("return {\n\tfile=%q,\n\theight=%d,\n\tchars={\n",
 		path..".png", self.height)
 	local x, y = 0, 0
@@ -386,7 +386,9 @@ function font:saveImage(path, width, height)
 				glyph.char, x, y, glyph.xOffset, glyph.yOffset, glyph.width, glyph.height, glyph.advance)
 			
 			-- Insert image
-			img:paste(glyph.imageData, x, y, 0, 0, glyph.width, glyph.height)
+			canvas:renderTo(function()
+				love.graphics.draw( glyph:getImage(), x, y )
+			end)
 			
 			x = x + glyph.width + 1
 		end
@@ -395,7 +397,7 @@ function font:saveImage(path, width, height)
 	-- Save
 	meta = meta .. "\t}\n}\n"
 	love.filesystem.write( path..".lua", meta )
-	img:encode( "png", path..".png" )
+	canvas:newImageData():encode( "png", path..".png" )
 end
 
 

@@ -76,7 +76,7 @@ function love.load(args)
 end
 
 function love.update(dt)
-	require("lib/lovebird").update()
+	-- require("lib/lovebird").update()
 	gui.gspot:update(dt)
 	
 	-- Update title to match font name

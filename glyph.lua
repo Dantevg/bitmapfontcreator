@@ -60,6 +60,12 @@ function glyph.newCombining(options)
 	}, {__index = glyph} )
 end
 
+-- Returns whether the coordinates are within the glyph
+function glyph:within( x, y )
+	return x-self.xOffset < self.width and y-self.yOffset < self.height
+			and x-self.xOffset >= 0 and y-self.yOffset >= 0
+end
+
 -- Returns the contours of the glyph, pixel by pixel
 -- TODO: optimize
 function glyph:getContours(scale)
@@ -98,7 +104,7 @@ end
 -- Set the pixel at position (x,y) to value
 function glyph:setPixel( x, y, value )
 	x, y = math.floor(x), math.floor(y)
-	if not value and (x >= self.width or y >= self.height) then return end
+	if not value and not self:within( x, y ) then return end
 	-- if x < 0 or y < 0 then return end
 	
 	self:autoresize( x, y ) -- Auto resize if pixel was out of range
@@ -152,8 +158,10 @@ end
 -- Resizes the glyph without losing the contents
 function glyph:resize( x, y, width, height )
 	width, height = width or self.width, height or self.height
-	x, y = x or 0, y or 0
-	if width == self.width and height == self.height and x == 0 and y == 0 then return end
+	x, y = x or self.xOffset, y or self.yOffset
+	
+	-- No change, don't resize
+	if width == self.width and height == self.height and x == self.xOffset and y == self.yOffset then return end
 	
 	local canvas = love.graphics.newCanvas( width, height )
 	canvas:renderTo(function()
@@ -167,23 +175,38 @@ function glyph:resize( x, y, width, height )
 	print("[INFO] Resized glyph "..self.name.." to "..self.width..", "..self.height.." with offset "..self.xOffset..", "..self.yOffset)
 end
 
+-- like math.min/max for 2 elements, but also accepts nil as first argument
+local function min2( a, b )
+	return a and math.min( a, b ) or b
+end
+local function max2( a, b )
+	return a and math.max( a, b ) or b
+end
+
 -- Resize glyph to fit contents
 function glyph:autoresize( x, y )
-	local minX, minY = x or 0, y or 0
-	local maxX, maxY = x or 0, y or 0
+	local minX, maxX, minY, maxY = x, x, y, y
+	
+	-- Find bounds in own image
 	self.imageData:mapPixel(function( x, y, r, g, b, ... )
 		if r ~= 0 and g ~= 0 and b ~= 0 then
-			minX, minY = math.min( minX, x+self.xOffset ), math.min( minY, y+self.yOffset )
-			maxX, maxY = math.max( maxX, x+self.xOffset ), math.max( maxY, y+self.yOffset )
+			minX = min2( minX, x+self.xOffset )
+			maxX = max2( maxX, x+self.xOffset )
+			minY = min2( minY, y+self.yOffset )
+			maxY = max2( maxY, y+self.yOffset )
 		end
 		return r, g, b, ...
 	end)
+	
+	-- Expand to fit components
 	for _, component in ipairs(self.components) do
-		minX = math.min( minX, component.x )
-		minY = math.min( minY, component.y )
-		maxX = math.max( maxX, component.x + component.glyph.width )
-		maxY = math.max( maxY, component.y + component.glyph.height )
+		minX = min2( minX, component.x )
+		minY = min2( minY, component.y )
+		maxX = max2( maxX, component.x + component.glyph.width )
+		maxY = max2( maxY, component.y + component.glyph.height )
 	end
+	
+	minX, minY, maxX, maxY = minX or 0, minY or 0, maxX or 0, maxY or 0
 	self:resize( minX, minY, maxX-minX+1, maxY-minY+1 )
 end
 

@@ -78,14 +78,21 @@ function font.load(path)
 	font.inputfiles.layercontents( fnt, love.filesystem.read(".temp/layercontents.plist") )
 	
 	for _, layer in ipairs(fnt.layers) do
-		local glyphs = font.inputfiles.glyphs_contents( fnt, love.filesystem.read(".temp/"..layer.directory.."/contents.plist") )
+		local glyphs = font.inputfiles.glyphs_contents(
+			fnt, love.filesystem.read(".temp/"..layer.directory.."/contents.plist")
+		)
 		for name, path in pairs(glyphs) do
-			table.insert( layer.glyphs, font.inputfiles.glif( fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name ) )
+			table.insert( layer.glyphs, font.inputfiles.glif(
+				fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name
+			) )
 		end
-		-- FIXME: For some reason, this *almost* sorts the table,
-		-- but ends up with some small mistakes (see issue #32)
 		table.sort( layer.glyphs, function(a,b)
-			return a.unicode and b.unicode and a.unicode < b.unicode
+			-- Compare unicode values when possible, otherwise (for combining glyphs) compare names
+			if a.unicode and b.unicode then
+				return a.unicode < b.unicode
+			else
+				return a.name < b.name
+			end
 		end )
 	end
 	

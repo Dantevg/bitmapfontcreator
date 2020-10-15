@@ -82,6 +82,8 @@ function font.load(path)
 		for name, path in pairs(glyphs) do
 			table.insert( layer.glyphs, font.inputfiles.glif( fnt, love.filesystem.read(".temp/"..layer.directory.."/"..path), name ) )
 		end
+		-- FIXME: For some reason, this *almost* sorts the table,
+		-- but ends up with some small mistakes (see issue #32)
 		table.sort( layer.glyphs, function(a,b)
 			return a.unicode and b.unicode and a.unicode < b.unicode
 		end )
@@ -362,7 +364,7 @@ end
 -- IMAGE OUTPUT
 
 function font:saveImage(path, width, height)
-	width, height = width or 128, height or 128
+	width, height = width or 64, height or 64
 	self:calculateHeight()
 	
 	local info = love.filesystem.getInfo(path or "")
@@ -375,7 +377,7 @@ function font:saveImage(path, width, height)
 		path..".png", self.height)
 	meta = meta .. string.format("\tdescription={\n\t\tfamily=%q,\n\t\tstyle=%q,\n\t},\n",
 		self.family, self.style)
-	meta = meta .. string.format("\ttexture={\n\t\tfile=%q,\n\t\twidth=%d,\n\t\theight=%d,\n\t}\n\tchars={\n",
+	meta = meta .. string.format("\ttexture={\n\t\tfile=%q,\n\t\twidth=%d,\n\t\theight=%d,\n\t},\n\tchars={\n",
 		path..".png", width, height)
 	local x, y = 0, 0
 	for _, glyph in ipairs(self.layers[1].glyphs) do

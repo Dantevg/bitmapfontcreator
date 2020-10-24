@@ -6,28 +6,27 @@
 ]]--
 
 local aglfn = require "lib/aglfn"
+local binding = require "lib/binding"
 
 local glyph = {}
 
 function glyph.new(options)
 	if not options then error("Expected options") end
-	if not options.imageData and (not options.width or not options.height) then
-		error("Expected imageData or width, height")
-	end
 	if not options.unicode and not options.name and not options.char then
 		error("Expected unicode or name or char")
 	end
 	
+	options.width, options.height = math.max(options.width or 1, 1), math.max(options.height or 1, 1)
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
 	local unicode = options.unicode or aglfn.getCodepoint( options.name or options.char )
 	
-	return setmetatable( {
+	local g = setmetatable( {
 		char = options.char or aglfn.getChar(unicode),
 		name = options.name or aglfn.getName(unicode),
 		unicode = unicode,
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
-		advance = options.advance or (options.width or imageData:getWidth())+1,
+		advance = options.advance or function(self) return self.xOffset + self.imageData:getWidth()+1 end,
 		xOffset = 0,
 		yOffset = 0,
 		components = {},
@@ -35,22 +34,22 @@ function glyph.new(options)
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
+	
+	return binding(g)
 end
 
 function glyph.newCombining(options)
 	if not options then error("Expected options") end
-	if not options.imageData and (not options.width or not options.height) then
-		error("Expected imageData or width, height")
-	end
 	if not options.name then error("Expected name") end
 	
+	options.width, options.height = math.max(options.width or 1, 1), math.max(options.height or 1, 1)
 	local imageData = options.imageData or love.image.newImageData( options.width, options.height )
 	
-	return setmetatable( {
+	local g = setmetatable( {
 		name = options.name,
 		width = options.width or imageData:getWidth(),
 		height = options.height or imageData:getHeight(),
-		advance = options.advance or (options.width or imageData:getWidth())+1,
+		advance = options.advance or function(self) return self.xOffset + self.imageData:getWidth()+1 end,
 		xOffset = 0,
 		yOffset = 0,
 		components = {},
@@ -58,6 +57,8 @@ function glyph.newCombining(options)
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
+	
+	return binding(g)
 end
 
 -- Returns whether the coordinates are within the glyph
@@ -227,7 +228,7 @@ function glyph:addComponent( glyph, x, y )
 		end
 	end
 	table.insert( glyph.isComponentOf, self )
-	table.insert( self.components, {glyph = glyph, x = x, y = y, colour = randomColour()} )
+	table.insert( self.components, binding{glyph = glyph, x = x, y = y, colour = randomColour()} )
 	print("[INFO] Added component glyph "..glyph.name.." to "..self.name)
 	return true
 end

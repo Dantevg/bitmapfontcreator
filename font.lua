@@ -159,7 +159,23 @@ function font.inputfiles.glif( fnt, input, name )
 		options.imageData = love.image.newImageData( ".temp/images/"..glif.image.fileName )
 	end
 	if glif.outline then
-		-- TODO: read outline to image
+		local glifxml = xmlread(input)[2]
+		for i = 1, #glifxml do
+			if glifxml[i].name == "outline" then
+				if #glifxml[i] == 0 then break end
+				options.outline = {scale = font.scale}
+				
+				for _, contourxml in ipairs(glifxml[i]) do -- Loop over all contours
+					local contour = {}
+					for _, point in ipairs(contourxml) do -- Loop over all contour points
+						table.insert( contour, point.args.x )
+						table.insert( contour, point.args.y )
+					end
+					table.insert( options.outline, contour )
+				end
+				break
+			end
+		end
 	end
 	
 	return options.unicode and glyph.new(options) or glyph.newCombining(options)

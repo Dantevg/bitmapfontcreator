@@ -24,8 +24,8 @@ function glyph.new(options)
 		char = options.char or aglfn.getChar(unicode),
 		name = options.name or aglfn.getName(unicode),
 		unicode = unicode,
-		width = options.width or imageData:getWidth(),
-		height = options.height or imageData:getHeight(),
+		width = options.width,
+		height = options.height,
 		advance = options.advance or function(self) return self.xOffset + self.imageData:getWidth()+1 end,
 		xOffset = 0,
 		yOffset = 0,
@@ -34,6 +34,10 @@ function glyph.new(options)
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
+	
+	if options.outline then
+		g:outlineToImage(options.outline)
+	end
 	
 	return binding(g)
 end
@@ -47,8 +51,8 @@ function glyph.newCombining(options)
 	
 	local g = setmetatable( {
 		name = options.name,
-		width = options.width or imageData:getWidth(),
-		height = options.height or imageData:getHeight(),
+		width = options.width,
+		height = options.height,
 		advance = options.advance or function(self) return self.xOffset + self.imageData:getWidth()+1 end,
 		xOffset = 0,
 		yOffset = 0,
@@ -57,6 +61,10 @@ function glyph.newCombining(options)
 		imageData = imageData,
 		images = {},
 	}, {__index = glyph} )
+	
+	if options.outline and not options.imageData then
+		g:outlineToImage(options.outline)
+	end
 	
 	return binding(g)
 end
@@ -100,6 +108,21 @@ function glyph:getContours(scale)
 	end
 	
 	return contours
+end
+
+function glyph:outlineToImage(outline)
+	local canvas = love.graphics.newCanvas( self.width, self.height )
+	canvas:renderTo(function()
+		love.graphics.setColor( 1, 1, 1, 1 )
+		for j, contour in ipairs(outline) do
+			if #contour == 0 then print(self.name, j) end
+			local triangles = love.math.triangulate(contour)
+			for i = 1, #triangles do
+				love.graphics.polygon( "fill", triangles[i] )
+			end
+		end
+	end)
+	self.imageData = canvas:newImageData()
 end
 
 -- Set the pixel at position (x,y) to value
